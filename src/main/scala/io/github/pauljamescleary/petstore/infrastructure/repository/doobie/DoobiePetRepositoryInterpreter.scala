@@ -2,11 +2,12 @@ package io.github.pauljamescleary.petstore
 package infrastructure.repository.doobie
 
 import cats.data._
+import cats.effect._
 import cats.syntax.all._
 import doobie._
 import doobie.implicits._
 import domain.pets.{Pet, PetRepositoryAlgebra, PetStatus}
-import SQLPagination._
+import SQLPagination._
 
 private object PetSQL {
   /* We require type StatusMeta to handle our ADT Status */
@@ -71,7 +72,7 @@ private object PetSQL {
   }
 }
 
-class DoobiePetRepositoryInterpreter[F[_]: Bracket[*[_], Throwable]](val xa: Transactor[F])
+class DoobiePetRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable]](val xa: Transactor[F])
     extends PetRepositoryAlgebra[F] {
   import PetSQL._
 
@@ -104,6 +105,6 @@ class DoobiePetRepositoryInterpreter[F[_]: Bracket[*[_], Throwable]](val xa: Tra
 }
 
 object DoobiePetRepositoryInterpreter {
-  def apply[F[_]: Bracket[*[_], Throwable]](xa: Transactor[F]): DoobiePetRepositoryInterpreter[F] =
+  def apply[F[_]: MonadCancel[*[_], Throwable]](xa: Transactor[F]): DoobiePetRepositoryInterpreter[F] =
     new DoobiePetRepositoryInterpreter(xa)
 }

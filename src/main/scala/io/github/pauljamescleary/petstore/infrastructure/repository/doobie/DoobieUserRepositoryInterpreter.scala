@@ -1,7 +1,9 @@
 package io.github.pauljamescleary.petstore
 package infrastructure.repository.doobie
 
-import cats.data.OptionT
+import cats.data.OptionT
+import cats.effect._
+
 import cats.syntax.all._
 import doobie._
 import doobie.implicits._
@@ -50,7 +52,7 @@ private object UserSQL {
   """.query
 }
 
-class DoobieUserRepositoryInterpreter[F[_]: Bracket[*[_], Throwable]](val xa: Transactor[F])
+class DoobieUserRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable]](val xa: Transactor[F])
     extends UserRepositoryAlgebra[F]
     with IdentityStore[F, Long, User] { self =>
   import UserSQL._
@@ -79,6 +81,6 @@ class DoobieUserRepositoryInterpreter[F[_]: Bracket[*[_], Throwable]](val xa: Tr
 }
 
 object DoobieUserRepositoryInterpreter {
-  def apply[F[_]: Bracket[*[_], Throwable]](xa: Transactor[F]): DoobieUserRepositoryInterpreter[F] =
+  def apply[F[_]: MonadCancel[*[_], Throwable]](xa: Transactor[F]): DoobieUserRepositoryInterpreter[F] =
     new DoobieUserRepositoryInterpreter(xa)
 }
