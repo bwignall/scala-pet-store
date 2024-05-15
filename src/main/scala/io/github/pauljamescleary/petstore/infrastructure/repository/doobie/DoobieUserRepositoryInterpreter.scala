@@ -1,8 +1,7 @@
 package io.github.pauljamescleary.petstore
 package infrastructure.repository.doobie
 
-import cats.data.OptionT
-import cats.effect.Bracket
+import cats.data.OptionT
 import cats.syntax.all._
 import doobie._
 import doobie.implicits._

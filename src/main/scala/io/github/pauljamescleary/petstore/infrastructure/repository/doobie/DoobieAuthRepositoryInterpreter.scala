@@ -3,8 +3,7 @@ package io.github.pauljamescleary.petstore.infrastructure.repository.doobie
 import java.time.Instant
 
 import cats._
-import cats.data._
-import cats.effect.Bracket
+import cats.data._
 import cats.syntax.all._
 import doobie._
 import doobie.implicits._

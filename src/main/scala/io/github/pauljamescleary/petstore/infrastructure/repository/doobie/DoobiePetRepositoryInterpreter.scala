@@ -6,8 +6,7 @@ import cats.syntax.all._
 import doobie._
 import doobie.implicits._
 import domain.pets.{Pet, PetRepositoryAlgebra, PetStatus}
-import SQLPagination._
-import cats.effect.Bracket
+import SQLPagination._
 
 private object PetSQL {
   /* We require type StatusMeta to handle our ADT Status */

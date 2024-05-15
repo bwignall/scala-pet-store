@@ -21,9 +21,10 @@ import io.circe.config.parser
 import domain.authentication.Auth
 import tsec.authentication.SecuredRequestHandler
 import tsec.mac.jca.HMACSHA256
+import cats.effect.Temporal
 
 object Server extends IOApp {
-  def createServer[F[_]: ContextShift: ConcurrentEffect: Timer]: Resource[F, H4Server[F]] =
+  def createServer[F[_]: ContextShift: ConcurrentEffect: Temporal]: Resource[F, H4Server[F]] =
     for {
       conf <- Resource.eval(parser.decodePathF[F, PetStoreConfig]("petstore"))
       serverEc <- ExecutionContexts.cachedThreadPool[F]
