@@ -1,26 +1,27 @@
 organization := "io.github.pauljamescleary"
 name := "scala-pet-store"
 version := "0.0.1-SNAPSHOT"
-crossScalaVersions := Seq("2.12.15", "2.13.6")
+// crossScalaVersions := Seq("2.13.13")
+scalaVersion := "2.13.13"
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
-val CatsVersion = "2.6.1"
-val CirceVersion = "0.14.1"
-val CirceGenericExVersion = "0.14.1"
-val CirceConfigVersion = "0.8.0"
-val DoobieVersion = "0.13.4"
-val EnumeratumCirceVersion = "1.7.0"
-val H2Version = "1.4.200"
-val Http4sVersion = "0.21.28"
-val KindProjectorVersion = "0.13.2"
-val LogbackVersion = "1.2.6"
-val Slf4jVersion = "1.7.30"
-val ScalaCheckVersion = "1.15.4"
-val ScalaTestVersion = "3.2.9"
+val CatsVersion = "2.10.0"
+val CirceVersion = "0.14.7"
+val CirceGenericExVersion = "0.14.3"
+val CirceConfigVersion = "0.10.1"
+val DoobieVersion = "1.0.0-RC5"
+val EnumeratumCirceVersion = "1.7.3"
+val H2Version = "2.2.224"
+val Http4sVersion = "0.23.16"
+val KindProjectorVersion = "0.13.3"
+val LogbackVersion = "1.5.6"
+val Slf4jVersion = "2.0.12"
+val ScalaCheckVersion = "1.18.0"
+val ScalaTestVersion = "3.2.18"
 val ScalaTestPlusVersion = "3.2.2.0"
-val FlywayVersion = "7.15.0"
-val TsecVersion = "0.2.1"
+val FlywayVersion = "10.11.0"
+val TsecVersion = "0.5.0"
 
 libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-core" % CatsVersion,
@@ -51,13 +52,13 @@ libraryDependencies ++= Seq(
   "io.github.jmcardon" %% "tsec-signatures" % TsecVersion,
   "io.github.jmcardon" %% "tsec-jwt-mac" % TsecVersion,
   "io.github.jmcardon" %% "tsec-jwt-sig" % TsecVersion,
-  "io.github.jmcardon" %% "tsec-http4s" % TsecVersion,
+  "io.github.jmcardon" %% "tsec-http4s" % TsecVersion
 )
 
 dependencyOverrides += "org.slf4j" % "slf4j-api" % Slf4jVersion
 
 addCompilerPlugin(
-  ("org.typelevel" %% "kind-projector" % KindProjectorVersion).cross(CrossVersion.full),
+  ("org.typelevel" %% "kind-projector" % KindProjectorVersion).cross(CrossVersion.full)
 )
 
 enablePlugins(ScalafmtPlugin, JavaAppPackaging, GhpagesPlugin, MicrositesPlugin, MdocPlugin)
@@ -76,6 +77,6 @@ micrositeDescription := "An example application using FP techniques in Scala"
 micrositeBaseUrl := "scala-pet-store"
 
 // Note: This fixes error with sbt run not loading config properly
-fork in run := true
+run / fork := true
 
 dockerExposedPorts ++= Seq(8080)
