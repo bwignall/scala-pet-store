@@ -9,7 +9,7 @@ import infrastructure.repository.doobie.{
   DoobieAuthRepositoryInterpreter,
   DoobieOrderRepositoryInterpreter,
   DoobiePetRepositoryInterpreter,
-  DoobieUserRepositoryInterpreter,
+  DoobieUserRepositoryInterpreter
 }
 import cats.effect._
 import org.http4s.server.{Router, Server => H4Server}
@@ -47,7 +47,7 @@ object Server extends IOApp {
         "/users" -> UserEndpoints
           .endpoints[F, BCrypt, HMACSHA256](userService, BCrypt.syncPasswordHasher[F], routeAuth),
         "/pets" -> PetEndpoints.endpoints[F, HMACSHA256](petService, routeAuth),
-        "/orders" -> OrderEndpoints.endpoints[F, HMACSHA256](orderService, routeAuth),
+        "/orders" -> OrderEndpoints.endpoints[F, HMACSHA256](orderService, routeAuth)
       ).orNotFound
       _ <- Resource.eval(DatabaseConfig.initializeDb(conf.db))
       server <- BlazeServerBuilder[F](serverEc)

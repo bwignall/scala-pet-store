@@ -14,8 +14,8 @@ import cats.syntax.all._
   *           as long as it is a Monad
   */
 class PetService[F[_]](
-    repository: PetRepositoryAlgebra[F],
-    validation: PetValidationAlgebra[F],
+  repository: PetRepositoryAlgebra[F],
+  validation: PetValidationAlgebra[F]
 ) {
   def create(pet: Pet)(implicit M: Monad[F]): EitherT[F, PetAlreadyExistsError, Pet] =
     for {
@@ -49,8 +49,8 @@ class PetService[F[_]](
 
 object PetService {
   def apply[F[_]](
-      repository: PetRepositoryAlgebra[F],
-      validation: PetValidationAlgebra[F],
+    repository: PetRepositoryAlgebra[F],
+    validation: PetValidationAlgebra[F]
   ): PetService[F] =
     new PetService[F](repository, validation)
 }
