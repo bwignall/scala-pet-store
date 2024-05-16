@@ -13,3 +13,5 @@ curl -X GET "http://localhost:8080/pets?pageSize=10&offset=0"
 
 echo "Deleting pet..."
 curl -X DELETE "http://localhost:8080/pets/1"
+
+echo "Done!"
