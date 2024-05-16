@@ -17,11 +17,9 @@ case class DatabaseConfig(
 )
 
 object DatabaseConfig {
-  def dbTransactor[F[_]: Async: ContextShift](dbc: DatabaseConfig,
-                                              connEc: ExecutionContext
-  ): Resource[F, HikariTransactor[F]] =
+  def dbTransactor[F[_]: Async](dbc: DatabaseConfig, connEc: ExecutionContext): Resource[F, HikariTransactor[F]] =
     HikariTransactor
-      .newHikariTransactor[F](dbc.driver, dbc.url, dbc.user, dbc.password, connEc, blocker)
+      .newHikariTransactor[F](dbc.driver, dbc.url, dbc.user, dbc.password, connEc)
 
   /**
     * Runs the flyway migrations against the target database

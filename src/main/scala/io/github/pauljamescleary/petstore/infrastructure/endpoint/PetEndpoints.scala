@@ -3,22 +3,20 @@ package infrastructure.endpoint
 
 import cats.data.Validated.Valid
 import cats.data._
-import cats.effect.Sync
+import cats.effect.Async
 import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.github.pauljamescleary.petstore.domain.authentication.Auth
+import io.github.pauljamescleary.petstore.domain.pets.{Pet, PetService, PetStatus}
+import io.github.pauljamescleary.petstore.domain.users.User
+import io.github.pauljamescleary.petstore.domain.{PetAlreadyExistsError, PetNotFoundError}
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, HttpRoutes, QueryParamDecoder}
-
-import domain.{PetAlreadyExistsError, PetNotFoundError}
-import domain.pets.{Pet, PetService, PetStatus}
-import io.github.pauljamescleary.petstore.domain.users.User
-import tsec.jwt.algorithms.JWTMacAlgo
 import tsec.authentication._
 
-class PetEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
+class PetEndpoints[F[_]: Async, Auth] extends Http4sDsl[F] {
   import Pagination._
 
   /* Parses out status query param which could be multi param */
@@ -31,7 +29,7 @@ class PetEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   /* Parses out tag query param, which could be multi-value */
   object TagMatcher extends OptionalMultiQueryParamDecoderMatcher[String]("tags")
 
-  implicit val petDecoder: EntityDecoder[F, Pet] = jsonOf[F, Pet]
+  implicit val petDecoder: EntityDecoder[F, Pet] = jsonOf
 
   private def createPetEndpoint(petService: PetService[F]): AuthEndpoint[F, Auth] = {
     case req @ POST -> Root asAuthed _ =>
@@ -137,7 +135,7 @@ class PetEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
 }
 
 object PetEndpoints {
-  def endpoints[F[_]: Sync, Auth: JWTMacAlgo](
+  def endpoints[F[_]: Async, Auth](
     petService: PetService[F],
     auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] =

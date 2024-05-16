@@ -2,23 +2,21 @@ package io.github.pauljamescleary.petstore
 package infrastructure.endpoint
 
 import cats.data.EitherT
-import cats.effect.Sync
+import cats.effect.Async
 import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
+import io.github.pauljamescleary.petstore.domain._
+import io.github.pauljamescleary.petstore.domain.authentication._
+import io.github.pauljamescleary.petstore.domain.users._
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, HttpRoutes}
-
-import domain._
-import domain.users._
-import domain.authentication._
-import tsec.common.Verified
-import tsec.jwt.algorithms.JWTMacAlgo
-import tsec.passwordhashers.{PasswordHash, PasswordHasher}
 import tsec.authentication._
+import tsec.common.Verified
+import tsec.passwordhashers.{PasswordHash, PasswordHasher}
 
-class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
+class UserEndpoints[F[_]: Async, A, Auth] extends Http4sDsl[F] {
   import Pagination._
 
   /* Jsonization of our User type */
@@ -138,7 +136,7 @@ class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
 }
 
 object UserEndpoints {
-  def endpoints[F[_]: Sync, A, Auth: JWTMacAlgo](
+  def endpoints[F[_]: Async, A, Auth](
     userService: UserService[F],
     cryptService: PasswordHasher[F, A],
     auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
