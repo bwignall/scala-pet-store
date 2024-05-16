@@ -4,6 +4,8 @@ package infrastructure.endpoint
 import domain.orders._
 import infrastructure.repository.inmemory._
 import cats.effect._
+import cats.effect.unsafe.implicits.global
+import cats.implicits._
 import io.circe._
 import io.circe.generic.semiauto._
 import org.http4s._
@@ -47,11 +49,14 @@ class OrderEndpointsSpec
 
     forAll { (order: Order, user: AdminUser) =>
       (for {
-        createRq <- POST(order, uri"/orders")
+        createRq <- Request[IO](POST, uri"/orders")
+          .withEntity(order)
+          .pure[IO]
         createRqAuth <- auth.embedToken(user.value, createRq)
         createResp <- orderRoutes.run(createRqAuth)
         orderResp <- createResp.as[Order]
-        getOrderRq <- GET(Uri.unsafeFromString(s"/orders/${orderResp.id.get}"))
+        getOrderRq <- Request[IO](GET, Uri.unsafeFromString(s"/orders/${orderResp.id.get}"))
+          .pure[IO]
         getOrderRqAuth <- auth.embedToken(user.value, getOrderRq)
         getOrderResp <- orderRoutes.run(getOrderRqAuth)
         orderResp2 <- getOrderResp.as[Order]
@@ -69,7 +74,8 @@ class OrderEndpointsSpec
 
     forAll { user: CustomerUser =>
       (for {
-        deleteRq <- DELETE(Uri.unsafeFromString(s"/orders/1"))
+        deleteRq <- Request[IO](DELETE, Uri.unsafeFromString(s"/orders/1"))
+          .pure[IO]
           .flatMap(auth.embedToken(user.value, _))
         deleteResp <- orderRoutes.run(deleteRq)
       } yield deleteResp.status shouldEqual Unauthorized).unsafeRunSync()
@@ -77,7 +83,8 @@ class OrderEndpointsSpec
 
     forAll { user: AdminUser =>
       (for {
-        deleteRq <- DELETE(Uri.unsafeFromString(s"/orders/1"))
+        deleteRq <- Request[IO](DELETE, Uri.unsafeFromString(s"/orders/1"))
+          .pure[IO]
           .flatMap(auth.embedToken(user.value, _))
         deleteResp <- orderRoutes.run(deleteRq)
       } yield deleteResp.status shouldEqual Ok).unsafeRunSync()

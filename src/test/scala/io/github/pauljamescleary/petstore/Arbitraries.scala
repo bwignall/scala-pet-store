@@ -17,17 +17,19 @@ import tsec.authentication.AugmentedJWT
 import tsec.jws.mac._
 import tsec.mac.jca._
 
+import cats.effect.unsafe.implicits.global
+
 trait PetStoreArbitraries {
   val userNameLength = 16
   val userNameGen: Gen[String] = Gen.listOfN(userNameLength, Gen.alphaChar).map(_.mkString)
 
-  implicit val instant = Arbitrary[Instant] {
+  implicit val instant: Arbitrary[Instant] = Arbitrary[Instant] {
     for {
       millis <- Gen.posNum[Long]
     } yield Instant.ofEpochMilli(millis)
   }
 
-  implicit val orderStatus = Arbitrary[OrderStatus] {
+  implicit val orderStatus: Arbitrary[OrderStatus] = Arbitrary[OrderStatus] {
     Gen.oneOf(Approved, Delivered, Placed)
   }
 
@@ -43,11 +45,11 @@ trait PetStoreArbitraries {
 
   implicit val orderNoUser: Arbitrary[Order] = order(None)
 
-  implicit val petStatus = Arbitrary[PetStatus] {
+  implicit val petStatus: Arbitrary[PetStatus] = Arbitrary[PetStatus] {
     Gen.oneOf(Available, Pending, Adopted)
   }
 
-  implicit val pet = Arbitrary[Pet] {
+  implicit val pet: Arbitrary[Pet] = Arbitrary[Pet] {
     for {
       name <- Gen.nonEmptyListOf(Gen.asciiPrintableChar).map(_.mkString)
       category <- arbitrary[String]
@@ -63,9 +65,9 @@ trait PetStoreArbitraries {
     } yield pets.Pet(name, category, bio, status, tags, photoUrls, id)
   }
 
-  implicit val role = Arbitrary[Role](Gen.oneOf(Role.values.toIndexedSeq))
+  implicit val role: Arbitrary[Role] = Arbitrary[Role](Gen.oneOf(Role.values.toIndexedSeq))
 
-  implicit val user = Arbitrary[User] {
+  implicit val user: Arbitrary[User] = Arbitrary[User] {
     for {
       userName <- userNameGen
       firstName <- arbitrary[String]
@@ -89,7 +91,7 @@ trait PetStoreArbitraries {
     user.arbitrary.map(user => CustomerUser(user.copy(role = Role.Customer)))
   }
 
-  implicit val userSignup = Arbitrary[SignupRequest] {
+  implicit val userSignup: Arbitrary[SignupRequest] = Arbitrary[SignupRequest] {
     for {
       userName <- userNameGen
       firstName <- arbitrary[String]
@@ -101,24 +103,23 @@ trait PetStoreArbitraries {
     } yield SignupRequest(userName, firstName, lastName, email, password, phone, role)
   }
 
-  implicit val secureRandomId = Arbitrary[SecureRandomId] {
+  implicit val secureRandomId: Arbitrary[SecureRandomId] = Arbitrary[SecureRandomId] {
     arbitrary[String].map(SecureRandomId.apply)
   }
 
   implicit val jwtMac: Arbitrary[JWTMac[HMACSHA256]] = Arbitrary {
     for {
       key <- Gen.const(HMACSHA256.unsafeGenerateKey)
-      claims <- Gen.finiteDuration.map(exp =>
-        JWTClaims.withDuration[IO](expiration = Some(exp)).unsafeRunSync(),
-      )
+      claims <- Gen.finiteDuration.map(exp => JWTClaims.withDuration[IO](expiration = Some(exp)).unsafeRunSync())
+
     } yield JWTMacImpure
       .build[HMACSHA256](claims, key)
       .getOrElse(throw new Exception("Inconceivable"))
   }
 
   implicit def augmentedJWT[A, I](implicit
-      arb1: Arbitrary[JWTMac[A]],
-      arb2: Arbitrary[I],
+    arb1: Arbitrary[JWTMac[A]],
+    arb2: Arbitrary[I]
   ): Arbitrary[AugmentedJWT[A, I]] =
     Arbitrary {
       for {

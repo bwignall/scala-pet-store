@@ -10,8 +10,10 @@ import org.scalatest.funsuite.AnyFunSuite
 import PetStoreArbitraries.pet
 import org.scalatest.matchers.should.Matchers
 
+import cats.effect.unsafe.implicits.global
+
 class PetQueryTypeCheckSpec extends AnyFunSuite with Matchers with IOChecker {
-  override val transactor: Transactor[IO] = testTransactor
+  override val transactor: Transactor[IO] = initializedTransactor[IO].unsafeRunSync()
 
   import PetSQL._
 

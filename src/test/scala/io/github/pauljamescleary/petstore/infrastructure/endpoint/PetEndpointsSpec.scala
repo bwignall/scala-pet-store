@@ -6,6 +6,7 @@ import domain.users._
 import domain.pets._
 import infrastructure.repository.inmemory._
 import cats.effect._
+import cats.implicits._
 import io.circe.generic.auto._
 import org.http4s._
 import org.http4s.implicits._
@@ -17,6 +18,8 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import tsec.mac.jca.HMACSHA256
 import org.scalatest.matchers.should.Matchers
+
+import cats.effect.unsafe.implicits.global
 
 class PetEndpointsSpec
     extends AnyFunSuite
@@ -44,14 +47,18 @@ class PetEndpointsSpec
 
     forAll { pet: Pet =>
       (for {
-        request <- POST(pet, uri"/pets")
+        request <- Request[IO](POST, uri"/pets")
+          .withEntity(pet)
+          .pure[IO]
         response <- petRoutes.run(request)
       } yield response.status shouldEqual Unauthorized).unsafeRunSync()
     }
 
     forAll { (pet: Pet, user: User) =>
       (for {
-        request <- POST(pet, uri"/pets")
+        request <- Request[IO](POST, uri"/pets")
+          .withEntity(pet)
+          .pure[IO]
           .flatMap(auth.embedToken(user, _))
         response <- petRoutes.run(request)
       } yield response.status shouldEqual Ok).unsafeRunSync()
@@ -59,11 +66,14 @@ class PetEndpointsSpec
 
     forAll { (pet: Pet, user: User) =>
       (for {
-        createRq <- POST(pet, uri"/pets")
+        createRq <- Request[IO](POST, uri"/pets")
+          .withEntity(pet)
+          .pure[IO]
           .flatMap(auth.embedToken(user, _))
         response <- petRoutes.run(createRq)
         createdPet <- response.as[Pet]
-        getRq <- GET(Uri.unsafeFromString(s"/pets/${createdPet.id.get}"))
+        getRq <- Request[IO](GET, Uri.unsafeFromString(s"/pets/${createdPet.id.get}"))
+          .pure[IO]
           .flatMap(auth.embedToken(user, _))
         response2 <- petRoutes.run(getRq)
       } yield {
@@ -78,12 +88,16 @@ class PetEndpointsSpec
 
     forAll { (pet: Pet, user: AdminUser) =>
       (for {
-        createRequest <- POST(pet, uri"/pets")
+        createRequest <- Request[IO](POST, uri"/pets")
+          .withEntity(pet)
+          .pure[IO]
           .flatMap(auth.embedToken(user.value, _))
         createResponse <- petRoutes.run(createRequest)
         createdPet <- createResponse.as[Pet]
         petToUpdate = createdPet.copy(name = createdPet.name.reverse)
-        updateRequest <- PUT(petToUpdate, Uri.unsafeFromString(s"/pets/${petToUpdate.id.get}"))
+        updateRequest <- Request[IO](PUT, Uri.unsafeFromString(s"/pets/${petToUpdate.id.get}"))
+          .withEntity(petToUpdate)
+          .pure[IO]
           .flatMap(auth.embedToken(user.value, _))
         updateResponse <- petRoutes.run(updateRequest)
         updatedPet <- updateResponse.as[Pet]
@@ -96,7 +110,9 @@ class PetEndpointsSpec
 
     forAll { (pet: Pet, user: AdminUser) =>
       (for {
-        createRequest <- POST(pet, uri"/pets")
+        createRequest <- Request[IO](POST, uri"/pets")
+          .withEntity(pet)
+          .pure[IO]
           .flatMap(auth.embedToken(user.value, _))
         createResponse <- petRoutes.run(createRequest)
         createdPet <- createResponse.as[Pet]
