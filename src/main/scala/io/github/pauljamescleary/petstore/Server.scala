@@ -28,6 +28,8 @@ object Server extends IOApp {
   def createServer[F[_]: Async: Network]: Resource[F, H4Server] =
     for {
       conf <- Resource.eval(parser.decodePathF[F, PetStoreConfig]("petstore"))
+      host = conf.server.host
+      port = conf.server.port
       _ <- ExecutionContexts.cachedThreadPool[F]
       connEc <- ExecutionContexts.fixedThreadPool[F](conf.db.connections.poolSize)
       _ <- ExecutionContexts.cachedThreadPool[F]
@@ -53,10 +55,10 @@ object Server extends IOApp {
       _ <- Resource.eval(DatabaseConfig.initializeDb(conf.db))
       server <- EmberServerBuilder
         .default[F]
-        .withHostOption(Host.fromString(conf.server.host))
+        .withHostOption(Host.fromString(host))
         .withPort(
           Port
-            .fromInt(conf.server.port)
+            .fromInt(port)
             .orElse(Port.fromInt(org.http4s.server.defaults.HttpPort))
             .get
         )
