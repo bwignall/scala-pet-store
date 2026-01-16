@@ -6,16 +6,18 @@ import cats.data._
 import cats.Monad
 import cats.syntax.all._
 
-/**
-  * The entry point to our domain, works with repositories and validations to implement behavior
-  * @param repository where we get our data
-  * @param validation something that provides validations to the service
-  * @tparam F - this is the container for the things we work with, could be scala.concurrent.Future, Option, anything
-  *           as long as it is a Monad
+/** The entry point to our domain, works with repositories and validations to implement behavior
+  * @param repository
+  *   where we get our data
+  * @param validation
+  *   something that provides validations to the service
+  * @tparam F
+  *   - this is the container for the things we work with, could be scala.concurrent.Future, Option,
+  *     anything as long as it is a Monad
   */
 class PetService[F[_]](
-  repository: PetRepositoryAlgebra[F],
-  validation: PetValidationAlgebra[F]
+    repository: PetRepositoryAlgebra[F],
+    validation: PetValidationAlgebra[F],
 ) {
   def create(pet: Pet)(implicit M: Monad[F]): EitherT[F, PetAlreadyExistsError, Pet] =
     for {
@@ -49,8 +51,8 @@ class PetService[F[_]](
 
 object PetService {
   def apply[F[_]](
-    repository: PetRepositoryAlgebra[F],
-    validation: PetValidationAlgebra[F]
+      repository: PetRepositoryAlgebra[F],
+      validation: PetValidationAlgebra[F],
   ): PetService[F] =
     new PetService[F](repository, validation)
 }

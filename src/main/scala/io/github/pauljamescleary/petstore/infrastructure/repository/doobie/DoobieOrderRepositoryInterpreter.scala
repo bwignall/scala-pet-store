@@ -53,7 +53,7 @@ class DoobieOrderRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable]](val x
 
 object DoobieOrderRepositoryInterpreter {
   def apply[F[_]: MonadCancel[*[_], Throwable]](
-    xa: Transactor[F]
+      xa: Transactor[F],
   ): DoobieOrderRepositoryInterpreter[F] =
     new DoobieOrderRepositoryInterpreter(xa)
 }

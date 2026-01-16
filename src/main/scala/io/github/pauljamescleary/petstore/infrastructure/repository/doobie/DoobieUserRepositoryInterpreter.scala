@@ -81,6 +81,8 @@ class DoobieUserRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable]](val xa
 }
 
 object DoobieUserRepositoryInterpreter {
-  def apply[F[_]: MonadCancel[*[_], Throwable]](xa: Transactor[F]): DoobieUserRepositoryInterpreter[F] =
+  def apply[F[_]: MonadCancel[*[_], Throwable]](
+      xa: Transactor[F],
+  ): DoobieUserRepositoryInterpreter[F] =
     new DoobieUserRepositoryInterpreter(xa)
 }

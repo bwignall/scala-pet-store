@@ -5,14 +5,20 @@ import cats.syntax.all._
 import domain.users._
 import cats.effect._
 import org.http4s._
-import tsec.authentication.{buildBearerAuthHeader, AugmentedJWT, IdentityStore, JWTAuthenticator, SecuredRequestHandler}
+import tsec.authentication.{
+  AugmentedJWT,
+  IdentityStore,
+  JWTAuthenticator,
+  SecuredRequestHandler,
+  buildBearerAuthHeader,
+}
 import tsec.jws.mac.{JWSMacCV, JWTMac}
 import tsec.mac.jca.HMACSHA256
 
 import scala.concurrent.duration._
 
-class AuthTest[F[_]: Sync](userRepo: UserRepositoryAlgebra[F] with IdentityStore[F, Long, User])(implicit
-  cv: JWSMacCV[F, HMACSHA256]
+class AuthTest[F[_]: Sync](userRepo: UserRepositoryAlgebra[F] with IdentityStore[F, Long, User])(
+    implicit cv: JWSMacCV[F, HMACSHA256],
 ) {
   private val symmetricKey = HMACSHA256.unsafeGenerateKey
   private val jwtAuth: JWTAuthenticator[F, Long, User, HMACSHA256] =

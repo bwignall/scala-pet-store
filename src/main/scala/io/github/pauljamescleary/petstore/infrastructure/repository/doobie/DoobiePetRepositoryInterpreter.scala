@@ -105,6 +105,8 @@ class DoobiePetRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable]](val xa:
 }
 
 object DoobiePetRepositoryInterpreter {
-  def apply[F[_]: MonadCancel[*[_], Throwable]](xa: Transactor[F]): DoobiePetRepositoryInterpreter[F] =
+  def apply[F[_]: MonadCancel[*[_], Throwable]](
+      xa: Transactor[F],
+  ): DoobiePetRepositoryInterpreter[F] =
     new DoobiePetRepositoryInterpreter(xa)
 }
