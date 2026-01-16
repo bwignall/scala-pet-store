@@ -3,28 +3,28 @@ name := "scala-pet-store"
 version := "0.0.1-SNAPSHOT"
 // crossScalaVersions := Seq("2.13.13")
 
-val scala2Version = "2.13.13"
+val scala2Version = "2.13.18"
 val scala3Version = "3.7.4"
 
 scalaVersion := scala2Version
 
 resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 
-val CatsVersion = "2.10.0"
-val CirceVersion = "0.14.7"
-val CirceGenericExVersion = "0.14.3"
-val CirceConfigVersion = "0.10.1"
-val DoobieVersion = "1.0.0-RC5"
-val EnumeratumCirceVersion = "1.7.3"
-val H2Version = "2.2.220"
-val Http4sVersion = "0.23.16"
-val KindProjectorVersion = "0.13.3"
-val LogbackVersion = "1.5.6"
-val Slf4jVersion = "2.0.12"
-val ScalaCheckVersion = "1.18.0"
-val ScalaTestVersion = "3.2.18"
+val CatsVersion = "2.13.0"
+val CirceVersion = "0.14.15"
+val CirceGenericExVersion = "0.14.4"
+val CirceConfigVersion = "0.10.2"
+val DoobieVersion = "1.0.0-RC11"
+val EnumeratumCirceVersion = "1.9.2"
+val H2Version = "2.4.240"
+val Http4sVersion = "0.23.17" // Stuck at 0.23.17 because of blaze-server
+val KindProjectorVersion = "0.13.4"
+val LogbackVersion = "1.5.24"
+val Slf4jVersion = "2.0.17"
+val ScalaCheckVersion = "1.19.0"
+val ScalaTestVersion = "3.2.19"
 val ScalaTestPlusVersion = "3.2.2.0"
-val FlywayVersion = "10.11.0"
+val FlywayVersion = "11.20.2"
 val TsecVersion = "0.5.0"
 
 libraryDependencies ++= Seq(
