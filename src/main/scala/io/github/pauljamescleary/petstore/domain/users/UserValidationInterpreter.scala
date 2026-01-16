@@ -10,7 +10,7 @@ class UserValidationInterpreter[F[_]: Applicative](userRepo: UserRepositoryAlgeb
   def doesNotExist(user: User): EitherT[F, UserAlreadyExistsError, Unit] =
     userRepo
       .findByUserName(user.userName)
-      .map(UserAlreadyExistsError)
+      .map(UserAlreadyExistsError(_))
       .toLeft(())
 
   def exists(userId: Option[Long]): EitherT[F, UserNotFoundError.type, Unit] =

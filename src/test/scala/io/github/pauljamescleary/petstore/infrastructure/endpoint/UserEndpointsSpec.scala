@@ -47,7 +47,7 @@ class UserEndpointsSpec
   test("create user and log in") {
     val userEndpoint = userRoutes()
 
-    forAll { userSignup: SignupRequest =>
+    forAll { (userSignup: SignupRequest) =>
       val (_, authorization) = signUpAndLogIn(userSignup, userEndpoint).unsafeRunSync()
       authorization shouldBe defined
     }
@@ -56,7 +56,7 @@ class UserEndpointsSpec
   test("update user") {
     val userEndpoint = userRoutes()
 
-    forAll { userSignup: SignupRequest =>
+    forAll { (userSignup: SignupRequest) =>
       (for {
         loginResp <- signUpAndLogInAsAdmin(userSignup, userEndpoint)
         (createdUser, authorization) = loginResp
@@ -78,7 +78,7 @@ class UserEndpointsSpec
   test("get user by userName") {
     val userEndpoint = userRoutes()
 
-    forAll { userSignup: SignupRequest =>
+    forAll { (userSignup: SignupRequest) =>
       (for {
         loginResp <- signUpAndLogInAsAdmin(userSignup, userEndpoint)
         (createdUser, authorization) = loginResp
@@ -97,7 +97,7 @@ class UserEndpointsSpec
   test("delete user by userName") {
     val userEndpoint = userRoutes()
 
-    forAll { userSignup: SignupRequest =>
+    forAll { (userSignup: SignupRequest) =>
       (for {
         loginResp <- signUpAndLogInAsCustomer(userSignup, userEndpoint)
         (createdUser, Some(authorization)) = loginResp
@@ -108,7 +108,7 @@ class UserEndpointsSpec
       } yield deleteResponse.status shouldEqual Unauthorized).unsafeRunSync()
     }
 
-    forAll { userSignup: SignupRequest =>
+    forAll { (userSignup: SignupRequest) =>
       (for {
         loginResp <- signUpAndLogInAsAdmin(userSignup, userEndpoint)
         (createdUser, Some(authorization)) = loginResp

@@ -45,7 +45,7 @@ class PetEndpointsSpec
   test("create pet") {
     val (auth, petRoutes, _) = getTestResources()
 
-    forAll { pet: Pet =>
+    forAll { (pet: Pet) =>
       (for {
         request <- Request[IO](POST, uri"/pets")
           .withEntity(pet)

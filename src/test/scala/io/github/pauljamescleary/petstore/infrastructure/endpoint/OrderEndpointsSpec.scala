@@ -72,7 +72,7 @@ class OrderEndpointsSpec
   test("user roles") {
     val (auth, orderRoutes) = getTestResources()
 
-    forAll { user: CustomerUser =>
+    forAll { (user: CustomerUser) =>
       (for {
         deleteRq <- Request[IO](DELETE, Uri.unsafeFromString(s"/orders/1"))
           .pure[IO]
@@ -81,7 +81,7 @@ class OrderEndpointsSpec
       } yield deleteResp.status shouldEqual Unauthorized).unsafeRunSync()
     }
 
-    forAll { user: AdminUser =>
+    forAll { (user: AdminUser) =>
       (for {
         deleteRq <- Request[IO](DELETE, Uri.unsafeFromString(s"/orders/1"))
           .pure[IO]

@@ -7,12 +7,32 @@ val scala2Version = "2.13.18"
 val scala3Version = "3.7.4"
 
 scalaVersion := scala2Version
+//scalaVersion := scala3Version
 
 resolvers += Resolver.sonatypeCentralSnapshots
 
+// Scala2
+
+// migration settings
+scalacOptions ++= Seq(
+  "-Xsource:3",
+  "-Xsource:3-cross"
+)
+
+// Scala3
+
+//scalacOptions ++= Seq(
+//  "-Xsource:3",
+//  "-Xsource:3-cross",
+//  "-source:3.0-migration",
+////  "-new-syntax",
+//  "-old_syntax",
+//  "-rewrite"
+//)
+
 val CatsVersion = "2.13.0"
 val CirceVersion = "0.14.15"
-val CirceGenericExVersion = "0.14.4"
+val CirceGenericExVersion = "0.14.5-RC1" //"0.14.4"
 val CirceConfigVersion = "0.10.2"
 val DoobieVersion = "1.0.0-RC11"
 val EnumeratumCirceVersion = "1.9.2"
@@ -23,7 +43,7 @@ val LogbackVersion = "1.5.24"
 val Slf4jVersion = "2.0.17"
 val ScalaCheckVersion = "1.19.0"
 val ScalaTestVersion = "3.2.19"
-val ScalaTestPlusVersion = "3.2.2.0"
+val ScalaTestPlusVersion = "3.2.19.0"
 val FlywayVersion = "11.20.2"
 val TsecVersion = "0.5.0"
 
@@ -49,7 +69,8 @@ libraryDependencies ++= Seq(
   "org.http4s" %% "http4s-blaze-client" % Http4sVersion % Test,
   "org.scalacheck" %% "scalacheck" % ScalaCheckVersion % Test,
   "org.scalatest" %% "scalatest" % ScalaTestVersion % Test,
-  "org.scalatestplus" %% "scalacheck-1-14" % ScalaTestPlusVersion % Test,
+//  "org.scalatestplus" %% "scalacheck-1-14" % ScalaTestPlusVersion % Test,
+  "org.scalatestplus" %% "scalacheck-1-19" % ScalaTestPlusVersion % Test,
   // Authentication dependencies
   "io.github.jmcardon" %% "tsec-common" % TsecVersion,
   "io.github.jmcardon" %% "tsec-password" % TsecVersion,
@@ -63,7 +84,8 @@ libraryDependencies ++= Seq(
 dependencyOverrides += "org.slf4j" % "slf4j-api" % Slf4jVersion
 
 addCompilerPlugin(
-  ("org.typelevel" %% "kind-projector" % KindProjectorVersion).cross(CrossVersion.full)
+//  ("org.typelevel" %% "kind-projector" % KindProjectorVersion).cross(CrossVersion.for3Use2_13)
+  "org.typelevel" % "kind-projector_2.13.18" % KindProjectorVersion // .cross(CrossVersion.for3Use2_13)
 )
 
 enablePlugins(ScalafmtPlugin, JavaAppPackaging, GhpagesPlugin, MicrositesPlugin, MdocPlugin)

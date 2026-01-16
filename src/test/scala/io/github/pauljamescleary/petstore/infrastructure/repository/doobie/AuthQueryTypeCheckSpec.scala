@@ -20,9 +20,9 @@ class AuthQueryTypeCheckSpec extends AnyFunSuite with Matchers with ScalaCheckPr
   import AuthSQL._
 
   test("Typecheck auth queries") {
-    forAll { jwt: AugmentedJWT[HMACSHA256, Long] => check(insert(jwt)) }
-    forAll { jwt: AugmentedJWT[HMACSHA256, Long] => check(update(jwt)) }
-    forAll { id: SecureRandomId => check(select(id)) }
-    forAll { id: SecureRandomId => check(delete(id)) }
+    forAll { (jwt: AugmentedJWT[HMACSHA256, Long]) => check(insert(jwt)) }
+    forAll { (jwt: AugmentedJWT[HMACSHA256, Long]) => check(update(jwt)) }
+    forAll { (id: SecureRandomId) => check(select(id)) }
+    forAll { (id: SecureRandomId) => check(delete(id)) }
   }
 }
