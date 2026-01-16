@@ -9,11 +9,11 @@ import infrastructure.repository.doobie.{
   DoobieAuthRepositoryInterpreter,
   DoobieOrderRepositoryInterpreter,
   DoobiePetRepositoryInterpreter,
-  DoobieUserRepositoryInterpreter,
+  DoobieUserRepositoryInterpreter
 }
 import cats.effect._
 import org.http4s.server.{Router, Server => H4Server}
-import org.http4s.server.blaze.BlazeServerBuilder
+import org.http4s.ember.server._
 import org.http4s.implicits._
 import tsec.passwordhashers.jca.BCrypt
 import doobie.util.ExecutionContexts
@@ -21,15 +21,19 @@ import io.circe.config.parser
 import domain.authentication.Auth
 import tsec.authentication.SecuredRequestHandler
 import tsec.mac.jca.HMACSHA256
+import com.comcast.ip4s.{Host, Port}
+import fs2.io.net.Network
 
 object Server extends IOApp {
-  def createServer[F[_]: ContextShift: ConcurrentEffect: Timer]: Resource[F, H4Server[F]] =
+  def createServer[F[_]: Async: Network]: Resource[F, H4Server] =
     for {
       conf <- Resource.eval(parser.decodePathF[F, PetStoreConfig]("petstore"))
-      serverEc <- ExecutionContexts.cachedThreadPool[F]
+      host = conf.server.host
+      port = conf.server.port
+      _ <- ExecutionContexts.cachedThreadPool[F]
       connEc <- ExecutionContexts.fixedThreadPool[F](conf.db.connections.poolSize)
-      txnEc <- ExecutionContexts.cachedThreadPool[F]
-      xa <- DatabaseConfig.dbTransactor(conf.db, connEc, Blocker.liftExecutionContext(txnEc))
+      _ <- ExecutionContexts.cachedThreadPool[F]
+      xa <- DatabaseConfig.dbTransactor(conf.db, connEc)
       key <- Resource.eval(HMACSHA256.generateKey[F])
       authRepo = DoobieAuthRepositoryInterpreter[F, HMACSHA256](key, xa)
       petRepo = DoobiePetRepositoryInterpreter[F](xa)
@@ -46,14 +50,23 @@ object Server extends IOApp {
         "/users" -> UserEndpoints
           .endpoints[F, BCrypt, HMACSHA256](userService, BCrypt.syncPasswordHasher[F], routeAuth),
         "/pets" -> PetEndpoints.endpoints[F, HMACSHA256](petService, routeAuth),
-        "/orders" -> OrderEndpoints.endpoints[F, HMACSHA256](orderService, routeAuth),
+        "/orders" -> OrderEndpoints.endpoints[F, HMACSHA256](orderService, routeAuth)
       ).orNotFound
       _ <- Resource.eval(DatabaseConfig.initializeDb(conf.db))
-      server <- BlazeServerBuilder[F](serverEc)
-        .bindHttp(conf.server.port, conf.server.host)
+      server <- EmberServerBuilder
+        .default[F]
+        .withHostOption(Host.fromString(host))
+        .withPort(
+          Port
+            .fromInt(port)
+            .orElse(Port.fromInt(org.http4s.server.defaults.HttpPort))
+            .get
+        )
         .withHttpApp(httpApp)
-        .resource
+        .build
     } yield server
 
-  def run(args: List[String]): IO[ExitCode] = createServer.use(_ => IO.never).as(ExitCode.Success)
+  def run(args: List[String]): IO[ExitCode] = createServer[IO]
+    .use(_ => IO.never)
+    .as(ExitCode.Success)
 }

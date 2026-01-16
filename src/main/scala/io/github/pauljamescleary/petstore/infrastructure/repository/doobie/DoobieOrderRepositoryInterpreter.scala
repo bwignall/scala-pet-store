@@ -2,7 +2,8 @@ package io.github.pauljamescleary.petstore
 package infrastructure.repository.doobie
 
 import cats.data.OptionT
-import cats.effect.Bracket
+import cats.effect._
+
 import cats.syntax.all._
 import doobie._
 import doobie.implicits._
@@ -31,7 +32,7 @@ private object OrderSQL {
   """.update
 }
 
-class DoobieOrderRepositoryInterpreter[F[_]: Bracket[*[_], Throwable]](val xa: Transactor[F])
+class DoobieOrderRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable]](val xa: Transactor[F])
     extends OrderRepositoryAlgebra[F] {
   import OrderSQL._
 
@@ -51,8 +52,8 @@ class DoobieOrderRepositoryInterpreter[F[_]: Bracket[*[_], Throwable]](val xa: T
 }
 
 object DoobieOrderRepositoryInterpreter {
-  def apply[F[_]: Bracket[*[_], Throwable]](
-      xa: Transactor[F],
+  def apply[F[_]: MonadCancel[*[_], Throwable]](
+    xa: Transactor[F]
   ): DoobieOrderRepositoryInterpreter[F] =
     new DoobieOrderRepositoryInterpreter(xa)
 }

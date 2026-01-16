@@ -9,10 +9,12 @@ import doobie.util.transactor.Transactor
 import PetStoreArbitraries.order
 import org.scalatest.matchers.should.Matchers
 
+import cats.effect.unsafe.implicits.global
+
 class OrderQueryTypeCheckSpec extends AnyFunSuite with Matchers with IOChecker {
   import OrderSQL._
 
-  override val transactor: Transactor[IO] = testTransactor
+  override val transactor: Transactor[IO] = initializedTransactor[IO].unsafeRunSync()
 
   test("Typecheck order queries") {
     check(delete(1L))

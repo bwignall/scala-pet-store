@@ -9,8 +9,10 @@ import doobie.util.transactor.Transactor
 import PetStoreArbitraries.user
 import org.scalatest.matchers.should.Matchers
 
+import cats.effect.unsafe.implicits.global
+
 class UserQueryTypeCheckSpec extends AnyFunSuite with Matchers with IOChecker {
-  override val transactor: Transactor[IO] = testTransactor
+  override val transactor: Transactor[IO] = initializedTransactor[IO].unsafeRunSync()
 
   import UserSQL._
 

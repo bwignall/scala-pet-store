@@ -1,26 +1,31 @@
 organization := "io.github.pauljamescleary"
 name := "scala-pet-store"
 version := "0.0.1-SNAPSHOT"
-crossScalaVersions := Seq("2.12.15", "2.13.6")
+// crossScalaVersions := Seq("2.13.13")
 
-resolvers += Resolver.sonatypeRepo("snapshots")
+val scala2Version = "2.13.18"
+val scala3Version = "3.7.4"
 
-val CatsVersion = "2.6.1"
-val CirceVersion = "0.14.1"
-val CirceGenericExVersion = "0.14.1"
-val CirceConfigVersion = "0.8.0"
-val DoobieVersion = "0.13.4"
-val EnumeratumCirceVersion = "1.7.0"
-val H2Version = "1.4.200"
-val Http4sVersion = "0.21.28"
-val KindProjectorVersion = "0.13.2"
-val LogbackVersion = "1.2.6"
-val Slf4jVersion = "1.7.30"
-val ScalaCheckVersion = "1.15.4"
-val ScalaTestVersion = "3.2.9"
+scalaVersion := scala2Version
+
+resolvers ++= Resolver.sonatypeOssRepos("snapshots")
+
+val CatsVersion = "2.13.0"
+val CirceVersion = "0.14.15"
+val CirceGenericExVersion = "0.14.4"
+val CirceConfigVersion = "0.10.2"
+val DoobieVersion = "1.0.0-RC11"
+val EnumeratumCirceVersion = "1.9.2"
+val H2Version = "2.4.240"
+val Http4sVersion = "0.23.17" // Stuck at 0.23.17 because of blaze-server
+val KindProjectorVersion = "0.13.4"
+val LogbackVersion = "1.5.24"
+val Slf4jVersion = "2.0.17"
+val ScalaCheckVersion = "1.19.0"
+val ScalaTestVersion = "3.2.19"
 val ScalaTestPlusVersion = "3.2.2.0"
-val FlywayVersion = "7.15.0"
-val TsecVersion = "0.2.1"
+val FlywayVersion = "11.20.2"
+val TsecVersion = "0.5.0"
 
 libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-core" % CatsVersion,
@@ -36,6 +41,7 @@ libraryDependencies ++= Seq(
   "com.beachape" %% "enumeratum-circe" % EnumeratumCirceVersion,
   "com.h2database" % "h2" % H2Version,
   "org.http4s" %% "http4s-blaze-server" % Http4sVersion,
+  "org.http4s" %% "http4s-ember-server" % Http4sVersion,
   "org.http4s" %% "http4s-circe" % Http4sVersion,
   "org.http4s" %% "http4s-dsl" % Http4sVersion,
   "ch.qos.logback" % "logback-classic" % LogbackVersion,
@@ -51,13 +57,13 @@ libraryDependencies ++= Seq(
   "io.github.jmcardon" %% "tsec-signatures" % TsecVersion,
   "io.github.jmcardon" %% "tsec-jwt-mac" % TsecVersion,
   "io.github.jmcardon" %% "tsec-jwt-sig" % TsecVersion,
-  "io.github.jmcardon" %% "tsec-http4s" % TsecVersion,
+  "io.github.jmcardon" %% "tsec-http4s" % TsecVersion
 )
 
 dependencyOverrides += "org.slf4j" % "slf4j-api" % Slf4jVersion
 
 addCompilerPlugin(
-  ("org.typelevel" %% "kind-projector" % KindProjectorVersion).cross(CrossVersion.full),
+  ("org.typelevel" %% "kind-projector" % KindProjectorVersion).cross(CrossVersion.full)
 )
 
 enablePlugins(ScalafmtPlugin, JavaAppPackaging, GhpagesPlugin, MicrositesPlugin, MdocPlugin)
@@ -76,6 +82,6 @@ micrositeDescription := "An example application using FP techniques in Scala"
 micrositeBaseUrl := "scala-pet-store"
 
 // Note: This fixes error with sbt run not loading config properly
-fork in run := true
+run / fork := true
 
 dockerExposedPorts ++= Seq(8080)

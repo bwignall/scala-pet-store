@@ -2,23 +2,21 @@ package io.github.pauljamescleary.petstore
 package infrastructure.endpoint
 
 import cats.data.EitherT
-import cats.effect.Sync
+import cats.effect.Async
 import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
+import io.github.pauljamescleary.petstore.domain._
+import io.github.pauljamescleary.petstore.domain.authentication._
+import io.github.pauljamescleary.petstore.domain.users._
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, HttpRoutes}
-
-import domain._
-import domain.users._
-import domain.authentication._
-import tsec.common.Verified
-import tsec.jwt.algorithms.JWTMacAlgo
-import tsec.passwordhashers.{PasswordHash, PasswordHasher}
 import tsec.authentication._
+import tsec.common.Verified
+import tsec.passwordhashers.{PasswordHash, PasswordHasher}
 
-class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
+class UserEndpoints[F[_]: Async, A, Auth] extends Http4sDsl[F] {
   import Pagination._
 
   /* Jsonization of our User type */
@@ -29,9 +27,9 @@ class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   implicit val signupReqDecoder: EntityDecoder[F, SignupRequest] = jsonOf
 
   private def loginEndpoint(
-      userService: UserService[F],
-      cryptService: PasswordHasher[F, A],
-      auth: Authenticator[F, Long, User, AugmentedJWT[Auth, Long]],
+    userService: UserService[F],
+    cryptService: PasswordHasher[F, A],
+    auth: Authenticator[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] =
     HttpRoutes.of[F] { case req @ POST -> Root / "login" =>
       val action = for {
@@ -39,13 +37,13 @@ class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
         name = login.userName
         user <- userService.getUserByName(name).leftMap(_ => UserAuthenticationFailedError(name))
         checkResult <- EitherT.liftF(
-          cryptService.checkpw(login.password, PasswordHash[A](user.hash)),
+          cryptService.checkpw(login.password, PasswordHash[A](user.hash))
         )
         _ <-
           if (checkResult == Verified) EitherT.rightT[F, UserAuthenticationFailedError](())
           else EitherT.leftT[F, User](UserAuthenticationFailedError(name))
         token <- user.id match {
-          case None => throw new Exception("Impossible") // User is not properly modeled
+          case None     => throw new Exception("Impossible") // User is not properly modeled
           case Some(id) => EitherT.right[UserAuthenticationFailedError](auth.create(id))
         }
       } yield (user, token)
@@ -58,8 +56,8 @@ class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
     }
 
   private def signupEndpoint(
-      userService: UserService[F],
-      crypt: PasswordHasher[F, A],
+    userService: UserService[F],
+    crypt: PasswordHasher[F, A]
   ): HttpRoutes[F] =
     HttpRoutes.of[F] { case req @ POST -> Root =>
       val action = for {
@@ -85,14 +83,14 @@ class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
       } yield result
 
       action.flatMap {
-        case Right(saved) => Ok(saved.asJson)
+        case Right(saved)            => Ok(saved.asJson)
         case Left(UserNotFoundError) => NotFound("User not found")
       }
   }
 
   private def listEndpoint(userService: UserService[F]): AuthEndpoint[F, Auth] = {
     case GET -> Root :? OptionalPageSizeMatcher(pageSize) :? OptionalOffsetMatcher(
-          offset,
+          offset
         ) asAuthed _ =>
       for {
         retrieved <- userService.list(pageSize.getOrElse(10), offset.getOrElse(0))
@@ -103,7 +101,7 @@ class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   private def searchByNameEndpoint(userService: UserService[F]): AuthEndpoint[F, Auth] = {
     case GET -> Root / userName asAuthed _ =>
       userService.getUserByName(userName).value.flatMap {
-        case Right(found) => Ok(found.asJson)
+        case Right(found)            => Ok(found.asJson)
         case Left(UserNotFoundError) => NotFound("The user was not found")
       }
   }
@@ -117,9 +115,9 @@ class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   }
 
   def endpoints(
-      userService: UserService[F],
-      cryptService: PasswordHasher[F, A],
-      auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]],
+    userService: UserService[F],
+    cryptService: PasswordHasher[F, A],
+    auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
     val authEndpoints: AuthService[F, Auth] =
       Auth.adminOnly {
@@ -138,10 +136,10 @@ class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
 }
 
 object UserEndpoints {
-  def endpoints[F[_]: Sync, A, Auth: JWTMacAlgo](
-      userService: UserService[F],
-      cryptService: PasswordHasher[F, A],
-      auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]],
+  def endpoints[F[_]: Async, A, Auth](
+    userService: UserService[F],
+    cryptService: PasswordHasher[F, A],
+    auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] =
     new UserEndpoints[F, A, Auth].endpoints(userService, cryptService, auth)
 }

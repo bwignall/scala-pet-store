@@ -3,6 +3,7 @@ package infrastructure
 package endpoint
 
 import cats.effect._
+import cats.implicits._
 import org.http4s._
 import org.http4s.implicits._
 import org.http4s.dsl._
@@ -19,6 +20,7 @@ import scala.concurrent.duration._
 import tsec.authentication.{JWTAuthenticator, SecuredRequestHandler}
 import tsec.mac.jca.HMACSHA256
 import org.scalatest.matchers.should.Matchers
+import cats.effect.unsafe.implicits.global
 
 class UserEndpointsSpec
     extends AnyFunSuite
@@ -37,7 +39,7 @@ class UserEndpointsSpec
     val usersEndpoint = UserEndpoints.endpoints(
       userService,
       BCrypt.syncPasswordHasher[IO],
-      SecuredRequestHandler(jwtAuth),
+      SecuredRequestHandler(jwtAuth)
     )
     Router(("/users", usersEndpoint)).orNotFound
   }
@@ -59,7 +61,9 @@ class UserEndpointsSpec
         loginResp <- signUpAndLogInAsAdmin(userSignup, userEndpoint)
         (createdUser, authorization) = loginResp
         userToUpdate = createdUser.copy(lastName = createdUser.lastName.reverse)
-        updateUser <- PUT(userToUpdate, Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+        updateUser <- Request[IO](PUT, Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+          .withEntity(userToUpdate)
+          .pure[IO]
         updateUserAuth = updateUser.putHeaders(authorization.get)
         updateResponse <- userEndpoint.run(updateUserAuth)
         updatedUser <- updateResponse.as[User]
@@ -78,7 +82,8 @@ class UserEndpointsSpec
       (for {
         loginResp <- signUpAndLogInAsAdmin(userSignup, userEndpoint)
         (createdUser, authorization) = loginResp
-        getRequest <- GET(Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+        getRequest <- Request[IO](GET, Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+          .pure[IO]
         getRequestAuth = getRequest.putHeaders(authorization.get)
         getResponse <- userEndpoint.run(getRequestAuth)
         getUser <- getResponse.as[User]
@@ -96,7 +101,8 @@ class UserEndpointsSpec
       (for {
         loginResp <- signUpAndLogInAsCustomer(userSignup, userEndpoint)
         (createdUser, Some(authorization)) = loginResp
-        deleteRequest <- DELETE(Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+        deleteRequest <- Request[IO](DELETE, Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+          .pure[IO]
         deleteRequestAuth = deleteRequest.putHeaders(authorization)
         deleteResponse <- userEndpoint.run(deleteRequestAuth)
       } yield deleteResponse.status shouldEqual Unauthorized).unsafeRunSync()
@@ -106,10 +112,12 @@ class UserEndpointsSpec
       (for {
         loginResp <- signUpAndLogInAsAdmin(userSignup, userEndpoint)
         (createdUser, Some(authorization)) = loginResp
-        deleteRequest <- DELETE(Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+        deleteRequest <- Request[IO](DELETE, Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+          .pure[IO]
         deleteRequestAuth = deleteRequest.putHeaders(authorization)
         deleteResponse <- userEndpoint.run(deleteRequestAuth)
-        getRequest <- GET(Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+        getRequest <- Request[IO](GET, Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+          .pure[IO]
         getRequestAuth = getRequest.putHeaders(authorization)
         getResponse <- userEndpoint.run(getRequestAuth)
       } yield {

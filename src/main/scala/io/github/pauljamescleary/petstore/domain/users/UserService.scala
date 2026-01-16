@@ -17,7 +17,7 @@ class UserService[F[_]](userRepo: UserRepositoryAlgebra[F], validation: UserVali
     userRepo.get(userId).toRight(UserNotFoundError)
 
   def getUserByName(
-      userName: String,
+    userName: String
   )(implicit F: Functor[F]): EitherT[F, UserNotFoundError.type, User] =
     userRepo.findByUserName(userName).toRight(UserNotFoundError)
 
@@ -39,8 +39,8 @@ class UserService[F[_]](userRepo: UserRepositoryAlgebra[F], validation: UserVali
 
 object UserService {
   def apply[F[_]](
-      repository: UserRepositoryAlgebra[F],
-      validation: UserValidationAlgebra[F],
+    repository: UserRepositoryAlgebra[F],
+    validation: UserValidationAlgebra[F]
   ): UserService[F] =
     new UserService[F](repository, validation)
 }
