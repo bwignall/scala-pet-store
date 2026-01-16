@@ -8,7 +8,7 @@ val scala3Version = "3.7.4"
 
 scalaVersion := scala2Version
 
-resolvers ++= Resolver.sonatypeOssRepos("snapshots")
+resolvers += Resolver.sonatypeCentralSnapshots
 
 val CatsVersion = "2.13.0"
 val CirceVersion = "0.14.15"
