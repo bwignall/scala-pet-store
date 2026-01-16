@@ -2,22 +2,22 @@ package io.github.pauljamescleary.petstore
 package infrastructure.endpoint
 
 import cats.data.Validated.Valid
-import cats.data._
+import cats.data.*
 import cats.effect.Async
-import cats.syntax.all._
-import io.circe.generic.auto._
-import io.circe.syntax._
+import cats.syntax.all.*
+import io.circe.generic.auto.*
+import io.circe.syntax.*
 import io.github.pauljamescleary.petstore.domain.authentication.Auth
 import io.github.pauljamescleary.petstore.domain.pets.{Pet, PetService, PetStatus}
 import io.github.pauljamescleary.petstore.domain.users.User
 import io.github.pauljamescleary.petstore.domain.{PetAlreadyExistsError, PetNotFoundError}
-import org.http4s.circe._
+import org.http4s.circe.*
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, HttpRoutes, QueryParamDecoder}
-import tsec.authentication._
+import tsec.authentication.*
 
 class PetEndpoints[F[_]: Async, Auth] extends Http4sDsl[F] {
-  import Pagination._
+  import Pagination.*
 
   /* Parses out status query param which could be multi param */
   implicit val statusQueryParamDecoder: QueryParamDecoder[PetStatus] =

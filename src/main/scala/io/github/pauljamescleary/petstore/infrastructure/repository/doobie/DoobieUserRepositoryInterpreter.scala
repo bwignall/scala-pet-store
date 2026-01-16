@@ -2,15 +2,15 @@ package io.github.pauljamescleary.petstore
 package infrastructure.repository.doobie
 
 import cats.data.OptionT
-import cats.effect._
+import cats.effect.*
 
-import cats.syntax.all._
-import doobie._
-import doobie.implicits._
+import cats.syntax.all.*
+import doobie.*
+import doobie.implicits.*
 import io.circe.parser.decode
-import io.circe.syntax._
+import io.circe.syntax.*
 import domain.users.{Role, User, UserRepositoryAlgebra}
-import io.github.pauljamescleary.petstore.infrastructure.repository.doobie.SQLPagination._
+import io.github.pauljamescleary.petstore.infrastructure.repository.doobie.SQLPagination.*
 import tsec.authentication.IdentityStore
 
 private object UserSQL {
@@ -52,10 +52,10 @@ private object UserSQL {
   """.query
 }
 
-class DoobieUserRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable]](val xa: Transactor[F])
+class DoobieUserRepositoryInterpreter[F[_]](val xa: Transactor[F])(implicit F: MonadCancel[F, Throwable])
     extends UserRepositoryAlgebra[F]
     with IdentityStore[F, Long, User] { self =>
-  import UserSQL._
+  import UserSQL.*
 
   def create(user: User): F[User] =
     insert(user).withUniqueGeneratedKeys[Long]("ID").map(id => user.copy(id = id.some)).transact(xa)
@@ -81,6 +81,6 @@ class DoobieUserRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable]](val xa
 }
 
 object DoobieUserRepositoryInterpreter {
-  def apply[F[_]: MonadCancel[*[_], Throwable]](xa: Transactor[F]): DoobieUserRepositoryInterpreter[F] =
+  def apply[F[_]](xa: Transactor[F])(implicit F: MonadCancel[F, Throwable]): DoobieUserRepositoryInterpreter[F] =
     new DoobieUserRepositoryInterpreter(xa)
 }

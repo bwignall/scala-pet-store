@@ -3,19 +3,19 @@ package io.github.pauljamescleary.petstore
 import java.time.Instant
 import cats.effect.IO
 import domain.authentication.SignupRequest
-import org.scalacheck._
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
-import domain.orders._
-import domain.orders.OrderStatus._
+import domain.orders.*
+import domain.orders.OrderStatus.*
 import domain.{orders, pets}
-import domain.pets._
-import domain.pets.PetStatus._
-import domain.users.{Role, _}
+import domain.pets.*
+import domain.pets.PetStatus.*
+import domain.users.{Role, *}
 import tsec.common.SecureRandomId
 import tsec.jwt.JWTClaims
 import tsec.authentication.AugmentedJWT
-import tsec.jws.mac._
-import tsec.mac.jca._
+import tsec.jws.mac.*
+import tsec.mac.jca.*
 
 import cats.effect.unsafe.implicits.global
 

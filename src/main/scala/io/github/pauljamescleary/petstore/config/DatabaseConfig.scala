@@ -1,6 +1,6 @@
 package io.github.pauljamescleary.petstore.config
 
-import cats.syntax.functor._
+import cats.syntax.functor.*
 import cats.effect.{Async, Resource, Sync}
 import doobie.hikari.HikariTransactor
 import org.flywaydb.core.Flyway

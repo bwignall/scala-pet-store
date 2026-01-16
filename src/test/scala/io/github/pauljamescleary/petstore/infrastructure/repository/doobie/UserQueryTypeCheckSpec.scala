@@ -14,7 +14,7 @@ import cats.effect.unsafe.implicits.global
 class UserQueryTypeCheckSpec extends AnyFunSuite with Matchers with IOChecker {
   override val transactor: Transactor[IO] = initializedTransactor[IO].unsafeRunSync()
 
-  import UserSQL._
+  import UserSQL.*
 
   test("Typecheck user queries") {
     user.arbitrary.sample.map { u =>

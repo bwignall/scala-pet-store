@@ -2,9 +2,9 @@ package io.github.pauljamescleary.petstore.domain
 package pets
 
 import cats.Functor
-import cats.data._
+import cats.data.*
 import cats.Monad
-import cats.syntax.all._
+import cats.syntax.all.*
 
 /**
   * The entry point to our domain, works with repositories and validations to implement behavior

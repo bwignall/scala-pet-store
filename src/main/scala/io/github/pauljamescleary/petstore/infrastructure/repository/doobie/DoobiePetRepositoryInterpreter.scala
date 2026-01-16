@@ -1,13 +1,13 @@
 package io.github.pauljamescleary.petstore
 package infrastructure.repository.doobie
 
-import cats.data._
-import cats.effect._
-import cats.syntax.all._
-import doobie._
-import doobie.implicits._
+import cats.data.*
+import cats.effect.*
+import cats.syntax.all.*
+import doobie.*
+import doobie.implicits.*
 import domain.pets.{Pet, PetRepositoryAlgebra, PetStatus}
-import SQLPagination._
+import SQLPagination.*
 
 private object PetSQL {
   /* We require type StatusMeta to handle our ADT Status */
@@ -72,9 +72,9 @@ private object PetSQL {
   }
 }
 
-class DoobiePetRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable]](val xa: Transactor[F])
+class DoobiePetRepositoryInterpreter[F[_]](val xa: Transactor[F])(implicit F: MonadCancel[F, Throwable])
     extends PetRepositoryAlgebra[F] {
-  import PetSQL._
+  import PetSQL.*
 
   def create(pet: Pet): F[Pet] =
     insert(pet).withUniqueGeneratedKeys[Long]("ID").map(id => pet.copy(id = id.some)).transact(xa)
@@ -105,6 +105,6 @@ class DoobiePetRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable]](val xa:
 }
 
 object DoobiePetRepositoryInterpreter {
-  def apply[F[_]: MonadCancel[*[_], Throwable]](xa: Transactor[F]): DoobiePetRepositoryInterpreter[F] =
+  def apply[F[_]](xa: Transactor[F])(implicit F: MonadCancel[F, Throwable]): DoobiePetRepositoryInterpreter[F] =
     new DoobiePetRepositoryInterpreter(xa)
 }

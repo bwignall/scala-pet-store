@@ -2,14 +2,14 @@ package io.github.pauljamescleary.petstore.infrastructure.repository.doobie
 
 import java.time.Instant
 
-import cats._
-import cats.data._
-import cats.effect._
+import cats.*
+import cats.data.*
+import cats.effect.*
 
-import cats.syntax.all._
-import doobie._
-import doobie.implicits._
-import doobie.implicits.legacy.instant._
+import cats.syntax.all.*
+import doobie.*
+import doobie.implicits.*
+import doobie.implicits.legacy.instant.*
 import tsec.authentication.{AugmentedJWT, BackingStore}
 import tsec.common.SecureRandomId
 import tsec.jws.JWSSerializer
@@ -38,12 +38,13 @@ private object AuthSQL {
       .query[(String, Long, Instant, Option[Instant])]
 }
 
-class DoobieAuthRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable], A](
+class DoobieAuthRepositoryInterpreter[F[_], A](
   val key: MacSigningKey[A],
   val xa: Transactor[F]
 )(implicit
   hs: JWSSerializer[JWSMacHeader[A]],
-  s: JWSMacCV[MacErrorM, A]
+  s: JWSMacCV[MacErrorM, A],
+  F: MonadCancel[F, Throwable]
 ) extends BackingStore[F, SecureRandomId, AugmentedJWT[A, Long]] {
   override def put(jwt: AugmentedJWT[A, Long]): F[AugmentedJWT[A, Long]] =
     AuthSQL.insert(jwt).run.transact(xa).as(jwt)
@@ -64,7 +65,8 @@ class DoobieAuthRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable], A](
 }
 
 object DoobieAuthRepositoryInterpreter {
-  def apply[F[_]: MonadCancel[*[_], Throwable], A](key: MacSigningKey[A], xa: Transactor[F])(implicit
+  def apply[F[_], A](key: MacSigningKey[A], xa: Transactor[F])(implicit
+    F: MonadCancel[F, Throwable],
     hs: JWSSerializer[JWSMacHeader[A]],
     s: JWSMacCV[MacErrorM, A]
   ): DoobieAuthRepositoryInterpreter[F, A] =

@@ -1,5 +1,5 @@
 package io.github.pauljamescleary.petstore.domain.pets
-import enumeratum._
+import enumeratum.*
 
 sealed trait PetStatus extends EnumEntry
 

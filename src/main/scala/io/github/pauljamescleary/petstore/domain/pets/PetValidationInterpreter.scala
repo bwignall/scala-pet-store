@@ -3,7 +3,7 @@ package pets
 
 import cats.Applicative
 import cats.data.EitherT
-import cats.syntax.all._
+import cats.syntax.all.*
 
 class PetValidationInterpreter[F[_]: Applicative](repository: PetRepositoryAlgebra[F]) extends PetValidationAlgebra[F] {
   def doesNotExist(pet: Pet): EitherT[F, PetAlreadyExistsError, Unit] = EitherT {

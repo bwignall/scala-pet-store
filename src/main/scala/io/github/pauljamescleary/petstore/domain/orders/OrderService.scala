@@ -3,7 +3,7 @@ package orders
 
 import cats.Functor
 import cats.data.EitherT
-import cats.syntax.all._
+import cats.syntax.all.*
 
 class OrderService[F[_]](orderRepo: OrderRepositoryAlgebra[F]) {
   def placeOrder(order: Order): F[Order] =

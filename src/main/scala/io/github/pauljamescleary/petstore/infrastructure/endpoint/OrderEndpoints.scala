@@ -2,11 +2,11 @@ package io.github.pauljamescleary.petstore
 package infrastructure.endpoint
 
 import cats.effect.Async
-import cats.syntax.all._
-import io.circe.generic.auto._
-import io.circe.syntax._
-import org.http4s._
-import org.http4s.circe._
+import cats.syntax.all.*
+import io.circe.generic.auto.*
+import io.circe.syntax.*
+import org.http4s.*
+import org.http4s.circe.*
 import org.http4s.dsl.Http4sDsl
 import domain.OrderNotFoundError
 import domain.authentication.Auth

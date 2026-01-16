@@ -3,7 +3,7 @@ package infrastructure.repository.doobie
 
 import cats.data.NonEmptyList
 import cats.effect.IO
-import cats.syntax.applicative._
+import cats.syntax.applicative.*
 import doobie.scalatest.IOChecker
 import doobie.util.transactor.Transactor
 import org.scalatest.funsuite.AnyFunSuite
@@ -15,7 +15,7 @@ import cats.effect.unsafe.implicits.global
 class PetQueryTypeCheckSpec extends AnyFunSuite with Matchers with IOChecker {
   override val transactor: Transactor[IO] = initializedTransactor[IO].unsafeRunSync()
 
-  import PetSQL._
+  import PetSQL.*
 
   test("Typecheck pet queries") {
     pet.arbitrary.sample.map { p =>
