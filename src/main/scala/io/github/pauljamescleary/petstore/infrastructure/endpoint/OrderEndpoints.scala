@@ -12,7 +12,7 @@ import domain.OrderNotFoundError
 import domain.authentication.Auth
 import domain.orders.{Order, OrderService}
 import io.github.pauljamescleary.petstore.domain.users.User
-import tsec.authentication.{asAuthed, AugmentedJWT, SecuredRequestHandler}
+import tsec.authentication.{AugmentedJWT, SecuredRequestHandler, asAuthed}
 
 class OrderEndpoints[F[_]: Async, Auth] extends Http4sDsl[F] {
   /* Needed to decode entities */
@@ -32,7 +32,7 @@ class OrderEndpoints[F[_]: Async, Auth] extends Http4sDsl[F] {
   private def getOrderEndpoint(orderService: OrderService[F]): AuthEndpoint[F, Auth] = {
     case GET -> Root / LongVar(id) asAuthed _ =>
       orderService.get(id).value.flatMap {
-        case Right(found)             => Ok(found.asJson)
+        case Right(found) => Ok(found.asJson)
         case Left(OrderNotFoundError) => NotFound("The order was not found")
       }
   }
@@ -46,12 +46,12 @@ class OrderEndpoints[F[_]: Async, Auth] extends Http4sDsl[F] {
   }
 
   def endpoints(
-    orderService: OrderService[F],
-    auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
+      orderService: OrderService[F],
+      auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]],
   ): HttpRoutes[F] = {
     val authEndpoints: AuthService[F, Auth] =
       Auth.allRolesHandler(
-        placeOrderEndpoint(orderService).orElse(getOrderEndpoint(orderService))
+        placeOrderEndpoint(orderService).orElse(getOrderEndpoint(orderService)),
       ) {
         Auth.adminOnly(deleteOrderEndpoint(orderService))
       }
@@ -62,8 +62,8 @@ class OrderEndpoints[F[_]: Async, Auth] extends Http4sDsl[F] {
 
 object OrderEndpoints {
   def endpoints[F[_]: Async, Auth](
-    orderService: OrderService[F],
-    auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
+      orderService: OrderService[F],
+      auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]],
   ): HttpRoutes[F] =
     new OrderEndpoints[F, Auth].endpoints(orderService, auth)
 }

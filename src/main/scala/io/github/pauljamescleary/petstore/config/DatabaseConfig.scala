@@ -9,20 +9,22 @@ import scala.concurrent.ExecutionContext
 
 case class DatabaseConnectionsConfig(poolSize: Int)
 case class DatabaseConfig(
-  url: String,
-  driver: String,
-  user: String,
-  password: String,
-  connections: DatabaseConnectionsConfig
+    url: String,
+    driver: String,
+    user: String,
+    password: String,
+    connections: DatabaseConnectionsConfig,
 )
 
 object DatabaseConfig {
-  def dbTransactor[F[_]: Async](dbc: DatabaseConfig, connEc: ExecutionContext): Resource[F, HikariTransactor[F]] =
+  def dbTransactor[F[_]: Async](
+      dbc: DatabaseConfig,
+      connEc: ExecutionContext,
+  ): Resource[F, HikariTransactor[F]] =
     HikariTransactor
       .newHikariTransactor[F](dbc.driver, dbc.url, dbc.user, dbc.password, connEc)
 
-  /**
-    * Runs the flyway migrations against the target database
+  /** Runs the flyway migrations against the target database
     */
   def initializeDb[F[_]](cfg: DatabaseConfig)(implicit S: Sync[F]): F[Unit] =
     S.delay {

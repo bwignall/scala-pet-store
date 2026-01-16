@@ -5,18 +5,18 @@ import domain.users.{Role, User}
 import tsec.passwordhashers.PasswordHash
 
 final case class LoginRequest(
-  userName: String,
-  password: String
+    userName: String,
+    password: String,
 )
 
 final case class SignupRequest(
-  userName: String,
-  firstName: String,
-  lastName: String,
-  email: String,
-  password: String,
-  phone: String,
-  role: Role
+    userName: String,
+    firstName: String,
+    lastName: String,
+    email: String,
+    password: String,
+    phone: String,
+    role: Role,
 ) {
   def asUser[A](hashedPassword: PasswordHash[A]): User = User(
     userName,
@@ -25,6 +25,6 @@ final case class SignupRequest(
     email,
     hashedPassword.toString,
     phone,
-    role = role
+    role = role,
   )
 }

@@ -16,7 +16,7 @@ package object doobie {
       cfg.url, // connect URL (driver-specific)
       cfg.user, // user
       cfg.password, // password
-      None // log handler
+      None, // log handler
     )
 
   /*

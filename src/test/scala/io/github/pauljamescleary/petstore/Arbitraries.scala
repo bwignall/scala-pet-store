@@ -59,7 +59,7 @@ trait PetStoreArbitraries {
       tags <- Gen.listOfN(numTags, Gen.alphaStr).map(_.toSet)
       photoUrls <- Gen
         .listOfN(numTags, Gen.alphaStr)
-        .map(_.map(x => s"http://${x}.com"))
+        .map(_.map(x => s"http://$x.com"))
         .map(_.toSet)
       id <- Gen.option(Gen.posNum[Long])
     } yield pets.Pet(name, category, bio, status, tags, photoUrls, id)
@@ -110,7 +110,9 @@ trait PetStoreArbitraries {
   implicit val jwtMac: Arbitrary[JWTMac[HMACSHA256]] = Arbitrary {
     for {
       key <- Gen.const(HMACSHA256.unsafeGenerateKey)
-      claims <- Gen.finiteDuration.map(exp => JWTClaims.withDuration[IO](expiration = Some(exp)).unsafeRunSync())
+      claims <- Gen.finiteDuration.map(exp =>
+        JWTClaims.withDuration[IO](expiration = Some(exp)).unsafeRunSync(),
+      )
 
     } yield JWTMacImpure
       .build[HMACSHA256](claims, key)
@@ -118,8 +120,8 @@ trait PetStoreArbitraries {
   }
 
   implicit def augmentedJWT[A, I](implicit
-    arb1: Arbitrary[JWTMac[A]],
-    arb2: Arbitrary[I]
+      arb1: Arbitrary[JWTMac[A]],
+      arb2: Arbitrary[I],
   ): Arbitrary[AugmentedJWT[A, I]] =
     Arbitrary {
       for {
