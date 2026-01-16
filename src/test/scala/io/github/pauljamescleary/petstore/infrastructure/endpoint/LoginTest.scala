@@ -25,8 +25,8 @@ trait LoginTest extends Http4sClientDsl[IO] with Http4sDsl[IO] {
   implicit val loginRequestDec: EntityDecoder[IO, LoginRequest] = jsonOf
 
   def signUpAndLogIn(
-    userSignUp: SignupRequest,
-    userEndpoint: HttpApp[IO]
+      userSignUp: SignupRequest,
+      userEndpoint: HttpApp[IO],
   ): IO[(User, Option[Authorization])] =
     for {
       signUpRq <- Request[IO](POST, uri"/users")
@@ -42,14 +42,14 @@ trait LoginTest extends Http4sClientDsl[IO] with Http4sDsl[IO] {
     } yield user -> loginResp.headers.get[Authorization]
 
   def signUpAndLogInAsAdmin(
-    userSignUp: SignupRequest,
-    userEndpoint: Kleisli[IO, Request[IO], Response[IO]]
+      userSignUp: SignupRequest,
+      userEndpoint: Kleisli[IO, Request[IO], Response[IO]],
   ): IO[(User, Option[Authorization])] =
     signUpAndLogIn(userSignUp.copy(role = Role.Admin), userEndpoint)
 
   def signUpAndLogInAsCustomer(
-    userSignUp: SignupRequest,
-    userEndpoint: Kleisli[IO, Request[IO], Response[IO]]
+      userSignUp: SignupRequest,
+      userEndpoint: Kleisli[IO, Request[IO], Response[IO]],
   ): IO[(User, Option[Authorization])] =
     signUpAndLogIn(userSignUp.copy(role = Role.Customer), userEndpoint)
 }

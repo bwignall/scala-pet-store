@@ -9,7 +9,7 @@ import infrastructure.repository.doobie.{
   DoobieAuthRepositoryInterpreter,
   DoobieOrderRepositoryInterpreter,
   DoobiePetRepositoryInterpreter,
-  DoobieUserRepositoryInterpreter
+  DoobieUserRepositoryInterpreter,
 }
 import cats.effect.*
 import org.http4s.server.{Router, Server as H4Server}
@@ -50,7 +50,7 @@ object Server extends IOApp {
         "/users" -> UserEndpoints
           .endpoints[F, BCrypt, HMACSHA256](userService, BCrypt.syncPasswordHasher[F], routeAuth),
         "/pets" -> PetEndpoints.endpoints[F, HMACSHA256](petService, routeAuth),
-        "/orders" -> OrderEndpoints.endpoints[F, HMACSHA256](orderService, routeAuth)
+        "/orders" -> OrderEndpoints.endpoints[F, HMACSHA256](orderService, routeAuth),
       ).orNotFound
       _ <- Resource.eval(DatabaseConfig.initializeDb(conf.db))
       server <- EmberServerBuilder
@@ -60,7 +60,7 @@ object Server extends IOApp {
           Port
             .fromInt(port)
             .orElse(Port.fromInt(org.http4s.server.defaults.HttpPort))
-            .get
+            .get,
         )
         .withHttpApp(httpApp)
         .build

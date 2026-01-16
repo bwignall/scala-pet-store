@@ -49,7 +49,7 @@ class UserRepositoryInMemoryInterpreter[F[_]: Applicative]
       for {
         user <- cache.values.find(u => u.userName == userName)
         removed <- cache.remove(user.id.get)
-      } yield removed
+      } yield removed,
     )
 }
 

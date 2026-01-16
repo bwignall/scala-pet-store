@@ -13,7 +13,11 @@ import org.scalatest.matchers.should.Matchers
 
 import cats.effect.unsafe.implicits.global
 
-class AuthQueryTypeCheckSpec extends AnyFunSuite with Matchers with ScalaCheckPropertyChecks with IOChecker {
+class AuthQueryTypeCheckSpec
+    extends AnyFunSuite
+    with Matchers
+    with ScalaCheckPropertyChecks
+    with IOChecker {
 
   override def transactor: doobie.Transactor[IO] = initializedTransactor[IO].unsafeRunSync()
 

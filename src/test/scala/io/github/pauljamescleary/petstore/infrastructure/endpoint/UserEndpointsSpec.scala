@@ -39,7 +39,7 @@ class UserEndpointsSpec
     val usersEndpoint = UserEndpoints.endpoints(
       userService,
       BCrypt.syncPasswordHasher[IO],
-      SecuredRequestHandler(jwtAuth)
+      SecuredRequestHandler(jwtAuth),
     )
     Router(("/users", usersEndpoint)).orNotFound
   }
@@ -101,7 +101,10 @@ class UserEndpointsSpec
       (for {
         loginResp <- signUpAndLogInAsCustomer(userSignup, userEndpoint)
         (createdUser, Some(authorization)) = loginResp
-        deleteRequest <- Request[IO](DELETE, Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+        deleteRequest <- Request[IO](
+          DELETE,
+          Uri.unsafeFromString(s"/users/${createdUser.userName}"),
+        )
           .pure[IO]
         deleteRequestAuth = deleteRequest.putHeaders(authorization)
         deleteResponse <- userEndpoint.run(deleteRequestAuth)
@@ -112,7 +115,10 @@ class UserEndpointsSpec
       (for {
         loginResp <- signUpAndLogInAsAdmin(userSignup, userEndpoint)
         (createdUser, Some(authorization)) = loginResp
-        deleteRequest <- Request[IO](DELETE, Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+        deleteRequest <- Request[IO](
+          DELETE,
+          Uri.unsafeFromString(s"/users/${createdUser.userName}"),
+        )
           .pure[IO]
         deleteRequestAuth = deleteRequest.putHeaders(authorization)
         deleteResponse <- userEndpoint.run(deleteRequestAuth)

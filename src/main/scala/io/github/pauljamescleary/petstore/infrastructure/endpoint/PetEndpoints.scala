@@ -54,7 +54,7 @@ class PetEndpoints[F[_]: Async, Auth] extends Http4sDsl[F] {
       } yield result
 
       action.flatMap {
-        case Right(saved)           => Ok(saved.asJson)
+        case Right(saved) => Ok(saved.asJson)
         case Left(PetNotFoundError) => NotFound("The pet was not found")
       }
   }
@@ -62,7 +62,7 @@ class PetEndpoints[F[_]: Async, Auth] extends Http4sDsl[F] {
   private def getPetEndpoint(petService: PetService[F]): AuthEndpoint[F, Auth] = {
     case GET -> Root / LongVar(id) asAuthed _ =>
       petService.get(id).value.flatMap {
-        case Right(found)           => Ok(found.asJson)
+        case Right(found) => Ok(found.asJson)
         case Left(PetNotFoundError) => NotFound("The pet was not found")
       }
   }
@@ -77,7 +77,7 @@ class PetEndpoints[F[_]: Async, Auth] extends Http4sDsl[F] {
 
   private def listPetsEndpoint(petService: PetService[F]): AuthEndpoint[F, Auth] = {
     case GET -> Root :? OptionalPageSizeMatcher(pageSize) :? OptionalOffsetMatcher(
-          offset
+          offset,
         ) asAuthed _ =>
       for {
         retrieved <- petService.list(pageSize.getOrElse(10), offset.getOrElse(0))
@@ -114,8 +114,8 @@ class PetEndpoints[F[_]: Async, Auth] extends Http4sDsl[F] {
   }
 
   def endpoints(
-    petService: PetService[F],
-    auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
+      petService: PetService[F],
+      auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]],
   ): HttpRoutes[F] = {
     val authEndpoints: AuthService[F, Auth] = {
       val allRoles =
@@ -136,8 +136,8 @@ class PetEndpoints[F[_]: Async, Auth] extends Http4sDsl[F] {
 
 object PetEndpoints {
   def endpoints[F[_]: Async, Auth](
-    petService: PetService[F],
-    auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
+      petService: PetService[F],
+      auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]],
   ): HttpRoutes[F] =
     new PetEndpoints[F, Auth].endpoints(petService, auth)
 }

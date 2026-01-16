@@ -5,7 +5,8 @@ import cats.Applicative
 import cats.data.EitherT
 import cats.syntax.all.*
 
-class PetValidationInterpreter[F[_]: Applicative](repository: PetRepositoryAlgebra[F]) extends PetValidationAlgebra[F] {
+class PetValidationInterpreter[F[_]: Applicative](repository: PetRepositoryAlgebra[F])
+    extends PetValidationAlgebra[F] {
   def doesNotExist(pet: Pet): EitherT[F, PetAlreadyExistsError, Unit] = EitherT {
     repository.findByNameAndCategory(pet.name, pet.category).map { matches =>
       if (matches.forall(possibleMatch => possibleMatch.bio != pet.bio)) {
@@ -24,7 +25,7 @@ class PetValidationInterpreter[F[_]: Applicative](repository: PetRepositoryAlgeb
           // In this example, we make sure that the option returned has a value, otherwise the pet was not found
           repository.get(id).map {
             case Some(_) => Right(())
-            case _       => Left(PetNotFoundError)
+            case _ => Left(PetNotFoundError)
           }
         case _ =>
           Either.left[PetNotFoundError.type, Unit](PetNotFoundError).pure[F]
