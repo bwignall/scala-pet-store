@@ -2,7 +2,11 @@ organization := "io.github.pauljamescleary"
 name := "scala-pet-store"
 version := "0.0.1-SNAPSHOT"
 // crossScalaVersions := Seq("2.13.13")
-scalaVersion := "2.13.13"
+
+val scala2Version = "2.13.13"
+val scala3Version = "3.7.4"
+
+scalaVersion := scala2Version
 
 resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 
