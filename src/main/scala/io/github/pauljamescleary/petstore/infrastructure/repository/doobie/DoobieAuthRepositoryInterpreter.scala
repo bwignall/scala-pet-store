@@ -2,14 +2,14 @@ package io.github.pauljamescleary.petstore.infrastructure.repository.doobie
 
 import java.time.Instant
 
-import cats._
-import cats.data._
-import cats.effect._
+import cats.*
+import cats.data.*
+import cats.effect.*
 
-import cats.syntax.all._
-import doobie._
-import doobie.implicits._
-import doobie.implicits.legacy.instant._
+import cats.syntax.all.*
+import doobie.*
+import doobie.implicits.*
+import doobie.implicits.legacy.instant.*
 import tsec.authentication.{AugmentedJWT, BackingStore}
 import tsec.common.SecureRandomId
 import tsec.jws.JWSSerializer
@@ -38,12 +38,13 @@ private object AuthSQL {
       .query[(String, Long, Instant, Option[Instant])]
 }
 
-class DoobieAuthRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable], A](
-    val key: MacSigningKey[A],
-    val xa: Transactor[F],
+class DoobieAuthRepositoryInterpreter[F[_], A](
+  val key: MacSigningKey[A],
+  val xa: Transactor[F]
 )(implicit
-    hs: JWSSerializer[JWSMacHeader[A]],
-    s: JWSMacCV[MacErrorM, A],
+  hs: JWSSerializer[JWSMacHeader[A]],
+  s: JWSMacCV[MacErrorM, A],
+  F: MonadCancel[F, Throwable]
 ) extends BackingStore[F, SecureRandomId, AugmentedJWT[A, Long]] {
   override def put(jwt: AugmentedJWT[A, Long]): F[AugmentedJWT[A, Long]] =
     AuthSQL.insert(jwt).run.transact(xa).as(jwt)
@@ -55,20 +56,19 @@ class DoobieAuthRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable], A](
     AuthSQL.delete(id).run.transact(xa).void
 
   override def get(id: SecureRandomId): OptionT[F, AugmentedJWT[A, Long]] =
-    OptionT(AuthSQL.select(id).option.transact(xa)).semiflatMap {
-      case (jwtStringify, identity, expiry, lastTouched) =>
-        JWTMacImpure.verifyAndParse(jwtStringify, key) match {
-          case Left(err) => err.raiseError[F, AugmentedJWT[A, Long]]
-          case Right(jwt) => AugmentedJWT(id, jwt, identity, expiry, lastTouched).pure[F]
-        }
+    OptionT(AuthSQL.select(id).option.transact(xa)).semiflatMap { case (jwtStringify, identity, expiry, lastTouched) =>
+      JWTMacImpure.verifyAndParse(jwtStringify, key) match {
+        case Left(err)  => err.raiseError[F, AugmentedJWT[A, Long]]
+        case Right(jwt) => AugmentedJWT(id, jwt, identity, expiry, lastTouched).pure[F]
+      }
     }
 }
 
 object DoobieAuthRepositoryInterpreter {
-  def apply[F[_]: MonadCancel[*[_], Throwable], A](key: MacSigningKey[A], xa: Transactor[F])(
-      implicit
-      hs: JWSSerializer[JWSMacHeader[A]],
-      s: JWSMacCV[MacErrorM, A],
+  def apply[F[_], A](key: MacSigningKey[A], xa: Transactor[F])(implicit
+    F: MonadCancel[F, Throwable],
+    hs: JWSSerializer[JWSMacHeader[A]],
+    s: JWSMacCV[MacErrorM, A]
   ): DoobieAuthRepositoryInterpreter[F, A] =
     new DoobieAuthRepositoryInterpreter(key, xa)
 }

@@ -1,24 +1,18 @@
 package io.github.pauljamescleary.petstore
 package infrastructure.endpoint
 
-import cats.syntax.all._
-import domain.users._
-import cats.effect._
-import org.http4s._
-import tsec.authentication.{
-  AugmentedJWT,
-  IdentityStore,
-  JWTAuthenticator,
-  SecuredRequestHandler,
-  buildBearerAuthHeader,
-}
+import cats.syntax.all.*
+import domain.users.*
+import cats.effect.*
+import org.http4s.*
+import tsec.authentication.{buildBearerAuthHeader, AugmentedJWT, IdentityStore, JWTAuthenticator, SecuredRequestHandler}
 import tsec.jws.mac.{JWSMacCV, JWTMac}
 import tsec.mac.jca.HMACSHA256
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-class AuthTest[F[_]: Sync](userRepo: UserRepositoryAlgebra[F] with IdentityStore[F, Long, User])(
-    implicit cv: JWSMacCV[F, HMACSHA256],
+class AuthTest[F[_]: Sync](userRepo: UserRepositoryAlgebra[F] & IdentityStore[F, Long, User])(implicit
+  cv: JWSMacCV[F, HMACSHA256]
 ) {
   private val symmetricKey = HMACSHA256.unsafeGenerateKey
   private val jwtAuth: JWTAuthenticator[F, Long, User, HMACSHA256] =

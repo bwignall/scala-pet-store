@@ -1,5 +1,5 @@
 package io.github.pauljamescleary.petstore.domain.orders
-import enumeratum._
+import enumeratum.*
 
 sealed trait OrderStatus extends EnumEntry
 

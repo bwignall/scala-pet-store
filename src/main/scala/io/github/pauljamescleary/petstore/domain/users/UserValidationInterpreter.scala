@@ -3,14 +3,14 @@ package users
 
 import cats.Applicative
 import cats.data.EitherT
-import cats.syntax.all._
+import cats.syntax.all.*
 
 class UserValidationInterpreter[F[_]: Applicative](userRepo: UserRepositoryAlgebra[F])
     extends UserValidationAlgebra[F] {
   def doesNotExist(user: User): EitherT[F, UserAlreadyExistsError, Unit] =
     userRepo
       .findByUserName(user.userName)
-      .map(UserAlreadyExistsError)
+      .map(UserAlreadyExistsError(_))
       .toLeft(())
 
   def exists(userId: Option[Long]): EitherT[F, UserNotFoundError.type, Unit] =

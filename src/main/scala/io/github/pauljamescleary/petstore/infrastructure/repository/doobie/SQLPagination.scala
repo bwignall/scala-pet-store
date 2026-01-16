@@ -1,7 +1,7 @@
 package io.github.pauljamescleary.petstore.infrastructure.repository.doobie
 
-import doobie._
-import doobie.implicits._
+import doobie.*
+import doobie.implicits.*
 
 /** Pagination is a convenience to simply add limits and offsets to any query Part of the motivation
   * for this is using doobie's typechecker, which fails unexpectedly for H2. H2 reports it requires

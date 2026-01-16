@@ -1,20 +1,20 @@
 package io.github.pauljamescleary.petstore
 
-import config._
-import domain.users._
-import domain.orders._
-import domain.pets._
-import infrastructure.endpoint._
+import config.*
+import domain.users.*
+import domain.orders.*
+import domain.pets.*
+import infrastructure.endpoint.*
 import infrastructure.repository.doobie.{
   DoobieAuthRepositoryInterpreter,
   DoobieOrderRepositoryInterpreter,
   DoobiePetRepositoryInterpreter,
   DoobieUserRepositoryInterpreter,
 }
-import cats.effect._
-import org.http4s.server.{Router, Server => H4Server}
-import org.http4s.ember.server._
-import org.http4s.implicits._
+import cats.effect.*
+import org.http4s.server.{Router, Server as H4Server}
+import org.http4s.ember.server.*
+import org.http4s.implicits.*
 import tsec.passwordhashers.jca.BCrypt
 import doobie.util.ExecutionContexts
 import io.circe.config.parser

@@ -1,10 +1,10 @@
 package io.github.pauljamescleary.petstore.domain
 package users
 
-import cats.data._
+import cats.data.*
 import cats.Functor
 import cats.Monad
-import cats.syntax.functor._
+import cats.syntax.functor.*
 
 class UserService[F[_]](userRepo: UserRepositoryAlgebra[F], validation: UserValidationAlgebra[F]) {
   def createUser(user: User)(implicit M: Monad[F]): EitherT[F, UserAlreadyExistsError, User] =

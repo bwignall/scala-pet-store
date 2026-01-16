@@ -12,7 +12,7 @@ import org.scalatest.matchers.should.Matchers
 import cats.effect.unsafe.implicits.global
 
 class OrderQueryTypeCheckSpec extends AnyFunSuite with Matchers with IOChecker {
-  import OrderSQL._
+  import OrderSQL.*
 
   override val transactor: Transactor[IO] = initializedTransactor[IO].unsafeRunSync()
 

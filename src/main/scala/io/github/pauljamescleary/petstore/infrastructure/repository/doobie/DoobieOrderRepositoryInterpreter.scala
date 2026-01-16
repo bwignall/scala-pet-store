@@ -2,12 +2,12 @@ package io.github.pauljamescleary.petstore
 package infrastructure.repository.doobie
 
 import cats.data.OptionT
-import cats.effect._
+import cats.effect.*
 
-import cats.syntax.all._
-import doobie._
-import doobie.implicits._
-import doobie.implicits.legacy.instant._
+import cats.syntax.all.*
+import doobie.*
+import doobie.implicits.*
+import doobie.implicits.legacy.instant.*
 import domain.orders.{Order, OrderRepositoryAlgebra, OrderStatus}
 
 private object OrderSQL {
@@ -32,9 +32,9 @@ private object OrderSQL {
   """.update
 }
 
-class DoobieOrderRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable]](val xa: Transactor[F])
+class DoobieOrderRepositoryInterpreter[F[_]](val xa: Transactor[F])(implicit F: MonadCancel[F, Throwable])
     extends OrderRepositoryAlgebra[F] {
-  import OrderSQL._
+  import OrderSQL.*
 
   def create(order: Order): F[Order] =
     insert(order)
@@ -52,8 +52,8 @@ class DoobieOrderRepositoryInterpreter[F[_]: MonadCancel[*[_], Throwable]](val x
 }
 
 object DoobieOrderRepositoryInterpreter {
-  def apply[F[_]: MonadCancel[*[_], Throwable]](
-      xa: Transactor[F],
-  ): DoobieOrderRepositoryInterpreter[F] =
+  def apply[F[_]](
+    xa: Transactor[F]
+  )(implicit F: MonadCancel[F, Throwable]): DoobieOrderRepositoryInterpreter[F] =
     new DoobieOrderRepositoryInterpreter(xa)
 }

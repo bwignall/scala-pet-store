@@ -1,6 +1,6 @@
 package io.github.pauljamescleary.petstore.domain.users
 
-import cats._
+import cats.*
 import tsec.authorization.{AuthGroup, SimpleAuthEnum}
 
 final case class Role(roleRepr: String)

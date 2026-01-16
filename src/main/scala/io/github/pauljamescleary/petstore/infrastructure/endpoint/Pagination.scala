@@ -5,7 +5,7 @@ import org.http4s.dsl.impl.OptionalQueryParamDecoderMatcher
 
 object Pagination {
   /* Necessary for decoding query parameters */
-  import QueryParamDecoder._
+  import QueryParamDecoder.*
 
   /* Parses out the optional offset and page size params */
   object OptionalPageSizeMatcher extends OptionalQueryParamDecoderMatcher[Int]("pageSize")

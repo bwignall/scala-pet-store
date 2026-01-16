@@ -1,7 +1,7 @@
 package io.github.pauljamescleary.petstore.domain.authentication
 
 import cats.MonadError
-import cats.effect._
+import cats.effect.*
 import io.github.pauljamescleary.petstore.domain.users.{Role, User}
 import org.http4s.Response
 import tsec.authentication.{
@@ -18,7 +18,7 @@ import tsec.jws.mac.JWSMacCV
 import tsec.jwt.algorithms.JWTMacAlgo
 import tsec.mac.jca.MacSigningKey
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 object Auth {
   def jwtAuthenticator[F[_]: Sync, Auth: JWTMacAlgo](

@@ -3,7 +3,7 @@ package infrastructure.endpoint
 
 import cats.data.Kleisli
 import cats.effect.IO
-import cats.implicits._
+import cats.implicits.*
 import domain.authentication.{LoginRequest, SignupRequest}
 import domain.users.{Role, User}
 import org.http4s.{EntityDecoder, EntityEncoder, HttpApp, Request, Response}
@@ -11,8 +11,8 @@ import org.http4s.circe.{jsonEncoderOf, jsonOf}
 import org.http4s.client.dsl.Http4sClientDsl
 import org.http4s.dsl.Http4sDsl
 import org.http4s.headers.Authorization
-import org.http4s.implicits._
-import io.circe.generic.auto._
+import org.http4s.implicits.*
+import io.circe.generic.auto.*
 
 trait LoginTest extends Http4sClientDsl[IO] with Http4sDsl[IO] {
   implicit val userEnc: EntityEncoder[IO, User] = jsonEncoderOf

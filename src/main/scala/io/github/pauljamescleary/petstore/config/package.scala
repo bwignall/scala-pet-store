@@ -1,7 +1,7 @@
 package io.github.pauljamescleary.petstore
 
 import io.circe.Decoder
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto.*
 
 package object config {
   implicit val srDec: Decoder[ServerConfig] = deriveDecoder

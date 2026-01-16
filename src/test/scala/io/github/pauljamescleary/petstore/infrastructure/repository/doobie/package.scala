@@ -1,9 +1,9 @@
 package io.github.pauljamescleary.petstore
 package infrastructure.repository
 
-import cats.syntax.all._
+import cats.syntax.all.*
 import cats.effect.Async
-import config._
+import config.*
 import _root_.doobie.Transactor
 import io.circe.config.parser
 

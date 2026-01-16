@@ -4,8 +4,8 @@ package infrastructure.repository.inmemory
 import scala.collection.concurrent.TrieMap
 import scala.util.Random
 
-import cats._
-import cats.syntax.all._
+import cats.*
+import cats.syntax.all.*
 import domain.orders.{Order, OrderRepositoryAlgebra}
 
 class OrderRepositoryInMemoryInterpreter[F[_]: Applicative] extends OrderRepositoryAlgebra[F] {

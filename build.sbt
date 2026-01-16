@@ -1,29 +1,68 @@
 organization := "io.github.pauljamescleary"
 name := "scala-pet-store"
 version := "0.0.1-SNAPSHOT"
-// crossScalaVersions := Seq("2.13.13")
 
 val scala2Version = "2.13.18"
 val scala3Version = "3.7.4"
 
 scalaVersion := scala2Version
+//scalaVersion := scala3Version
+
+crossScalaVersions := Seq(scala2Version, scala3Version)
 
 resolvers += Resolver.sonatypeCentralSnapshots
 
+scalacOptions ++= {
+  Seq(
+    "-encoding",
+    "UTF-8",
+    "-feature",
+    "-language:implicitConversions"
+    // disabled during the migration
+    // "-Xfatal-warnings"
+  ) ++
+    (CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((3, _)) =>
+        Seq(
+          "-unchecked",
+          "-source:3.0-migration",
+          "-rewrite"
+        )
+      case _ =>
+        Seq(
+          "-Xsource:3",
+          "-Xsource:3-cross",
+          "-deprecation",
+          "-Xfatal-warnings",
+          "-Wunused:imports,privates,locals",
+          "-Wvalue-discard"
+        )
+    })
+}
+
+scalacOptions ~= { opts =>
+  opts
+    .filterNot(x =>
+      (x == "-Ykind-projector")
+        || (x == "-source")
+        || (x == "future")
+        || (x == "-Xfatal-warnings")
+    )
+}
+
 val CatsVersion = "2.13.0"
 val CirceVersion = "0.14.15"
-val CirceGenericExVersion = "0.14.4"
+val CirceGenericExVersion = "0.14.5-RC1" //"0.14.4"
 val CirceConfigVersion = "0.10.2"
 val DoobieVersion = "1.0.0-RC11"
 val EnumeratumCirceVersion = "1.9.2"
 val H2Version = "2.4.240"
 val Http4sVersion = "0.23.17" // Stuck at 0.23.17 because of blaze-server
-val KindProjectorVersion = "0.13.4"
 val LogbackVersion = "1.5.24"
 val Slf4jVersion = "2.0.17"
 val ScalaCheckVersion = "1.19.0"
 val ScalaTestVersion = "3.2.19"
-val ScalaTestPlusVersion = "3.2.2.0"
+val ScalaTestPlusVersion = "3.2.19.0"
 val FlywayVersion = "11.20.2"
 val TsecVersion = "0.5.0"
 
@@ -49,7 +88,8 @@ libraryDependencies ++= Seq(
   "org.http4s" %% "http4s-blaze-client" % Http4sVersion % Test,
   "org.scalacheck" %% "scalacheck" % ScalaCheckVersion % Test,
   "org.scalatest" %% "scalatest" % ScalaTestVersion % Test,
-  "org.scalatestplus" %% "scalacheck-1-14" % ScalaTestPlusVersion % Test,
+//  "org.scalatestplus" %% "scalacheck-1-14" % ScalaTestPlusVersion % Test,
+  "org.scalatestplus" %% "scalacheck-1-19" % ScalaTestPlusVersion % Test,
   // Authentication dependencies
   "io.github.jmcardon" %% "tsec-common" % TsecVersion,
   "io.github.jmcardon" %% "tsec-password" % TsecVersion,
@@ -57,14 +97,10 @@ libraryDependencies ++= Seq(
   "io.github.jmcardon" %% "tsec-signatures" % TsecVersion,
   "io.github.jmcardon" %% "tsec-jwt-mac" % TsecVersion,
   "io.github.jmcardon" %% "tsec-jwt-sig" % TsecVersion,
-  "io.github.jmcardon" %% "tsec-http4s" % TsecVersion,
+  "io.github.jmcardon" %% "tsec-http4s" % TsecVersion
 )
 
 dependencyOverrides += "org.slf4j" % "slf4j-api" % Slf4jVersion
-
-addCompilerPlugin(
-  ("org.typelevel" %% "kind-projector" % KindProjectorVersion).cross(CrossVersion.full),
-)
 
 enablePlugins(ScalafmtPlugin, JavaAppPackaging, GhpagesPlugin, MicrositesPlugin, MdocPlugin)
 

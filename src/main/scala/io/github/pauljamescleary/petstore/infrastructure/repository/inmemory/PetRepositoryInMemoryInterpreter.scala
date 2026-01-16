@@ -4,9 +4,9 @@ package infrastructure.repository.inmemory
 import scala.collection.concurrent.TrieMap
 import scala.util.Random
 
-import cats._
+import cats.*
 import cats.data.NonEmptyList
-import cats.implicits._
+import cats.implicits.*
 import domain.pets.{Pet, PetRepositoryAlgebra, PetStatus}
 
 class PetRepositoryInMemoryInterpreter[F[_]: Applicative] extends PetRepositoryAlgebra[F] {

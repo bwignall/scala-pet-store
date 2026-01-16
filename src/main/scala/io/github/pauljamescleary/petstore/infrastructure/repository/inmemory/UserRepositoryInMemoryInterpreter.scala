@@ -3,7 +3,7 @@ package infrastructure.repository.inmemory
 
 import java.util.Random
 
-import cats.implicits._
+import cats.implicits.*
 import cats.Applicative
 import cats.data.OptionT
 import domain.users.{User, UserRepositoryAlgebra}
