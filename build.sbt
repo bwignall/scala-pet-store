@@ -5,19 +5,19 @@ version := "0.0.1-SNAPSHOT"
 val scala2Version = "2.13.18"
 val scala3Version = "3.7.4"
 
-scalaVersion := scala2Version
-//scalaVersion := scala3Version
+//scalaVersion := scala2Version
+scalaVersion := scala3Version
 
 crossScalaVersions := Seq(scala2Version, scala3Version)
 
 resolvers += Resolver.sonatypeCentralSnapshots
 
-scalacOptions ++= {
+scalacOptions ++=
   Seq(
     "-encoding",
     "UTF-8",
     "-feature",
-    "-language:implicitConversions"
+    "-language:implicitConversions",
     // disabled during the migration
     // "-Xfatal-warnings"
   ) ++
@@ -26,7 +26,7 @@ scalacOptions ++= {
         Seq(
           "-unchecked",
           "-source:3.0-migration",
-          "-rewrite"
+          "-rewrite",
         )
       case _ =>
         Seq(
@@ -35,18 +35,17 @@ scalacOptions ++= {
           "-deprecation",
           "-Xfatal-warnings",
           "-Wunused:imports,privates,locals",
-          "-Wvalue-discard"
+          "-Wvalue-discard",
         )
     })
-}
 
 scalacOptions ~= { opts =>
   opts
     .filterNot(x =>
-      (x == "-Ykind-projector")
-        || (x == "-source")
-        || (x == "future")
-        || (x == "-Xfatal-warnings")
+      (x == "-Ykind-projector") ||
+        (x == "-source") ||
+        (x == "future") ||
+        (x == "-Xfatal-warnings"),
     )
 }
 
@@ -97,7 +96,7 @@ libraryDependencies ++= Seq(
   "io.github.jmcardon" %% "tsec-signatures" % TsecVersion,
   "io.github.jmcardon" %% "tsec-jwt-mac" % TsecVersion,
   "io.github.jmcardon" %% "tsec-jwt-sig" % TsecVersion,
-  "io.github.jmcardon" %% "tsec-http4s" % TsecVersion
+  "io.github.jmcardon" %% "tsec-http4s" % TsecVersion,
 )
 
 dependencyOverrides += "org.slf4j" % "slf4j-api" % Slf4jVersion
