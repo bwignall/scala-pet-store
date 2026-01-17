@@ -1,0 +1,11 @@
+[project]
+name = "scala-pet-store"
+version = "0.1.0"
+description = "An implementation of the Java pet store using FP techniques in Scala"
+
+[dependency-groups]
+dev = [
+    "pyhamcrest>=2.1.0",
+    "pytest>=9.0.2",
+    "requests>=2.32.5",
+]
